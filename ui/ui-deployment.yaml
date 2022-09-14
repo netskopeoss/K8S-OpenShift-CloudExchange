@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: ui
+    test: "test"
+  name: netskope-ce-ui
+  namespace: <NAMESPACE_NAME>
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ui
+      test: "test"
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        network.kubernetes.io/app-tier: "true"
+        app.kubernetes.io/name: ui
+        test: "test"
+      namespace: <NAMESPACE_NAME>
+    spec:
+      initContainers:
+        - name: init-core
+          image: busybox:latest
+          env:
+            - name: CORE_SERVICE
+              value: netskope-ce-core-service
+          command:
+            - sh
+            - "-c"
+            - >-
+              until nc -z netskope-ce-core-service 80 > /dev/null;
+              do 
+                echo waiting for core;sleep 2; 
+              done;
+      containers:
+        - env:
+            - name: CORE_SERVICE_NAME
+              value: netskope-ce-core-service
+            - name: CE_API_URL
+              value: http://$(CORE_SERVICE_NAME)
+            - name: TLS_VERSION
+              value: TLSv1.3
+          image: <UI_IMAGE_NAME>
+          name: netskope-ce-ui
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: 2000m
+            requests:
+              memory: 2Gi
+              cpu: 1000m
+          volumeMounts:
+            - name: cert-vol
+              readOnly: true
+              mountPath: "/tmp/ssl_certs"
+      restartPolicy: Always
+      serviceAccount: <SERVICEACCOUNT_NAME>
+      volumes:
+        - name: cert-vol
+          secret:
+            secretName: netskope-ce-cert
+status: {}

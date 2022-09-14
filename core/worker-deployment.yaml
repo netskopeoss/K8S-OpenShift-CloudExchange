@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: core
+  name: netskope-ce-worker
+  namespace: <NAMESPACE_NAME>
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: core
+  template:
+    metadata:
+      labels:
+        network.kubernetes.io/app-tier: "true"
+        app.kubernetes.io/name: core
+      namespace: <NAMESPACE_NAME>
+    spec:
+      initContainers:
+        - name: init-mongo-rabbitmq
+          image: busybox:latest
+          env:
+            - name: CORE_SERVICE
+              value: netskope-ce-core-service
+          command:
+            - sh
+            - "-c"
+            - >-
+              until nc -z $(CORE_SERVICE) 80 > /dev/null;
+              do 
+                echo waiting for core;sleep 2; 
+              done;
+      containers:
+        - env:
+            - name: MONGODB_SERVICE_NAME
+              value: netskope-ce-mongodb-headless
+            - name: ANALYTICS_BASE_URL
+              value: https://reporting.netskope.tech
+            - name: ANALYTICS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: analytics-token
+                  name: netskope-ce-core
+            - name: ENABLE_CELERY_BEAT
+              value: "false"
+            # - name: HTTPS_PROXY
+            #   value:
+            # - name: HTTP_PROXY
+            #   value:
+            - name: JWT_ALGORITHM
+              value: HS256
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: jwt-secret
+                  name: netskope-ce-core
+            - name: MONGODB_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  key: mongodb-root-username
+                  name: netskope-ce-mongodb
+            - name: MONGODB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: mongodb-root-escaped-password
+                  name: netskope-ce-mongodb
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: rabbitmq-password
+                  name: netskope-ce-rabbitmq
+            - name: MAX_MAINTENANCE_WINDOW_MINUTES
+              value: "15"
+            - name: MAX_WAIT_ON_LOCK_IN_MINUTES
+              value: "240"
+            - name: PULL_THREADS
+              value: "6"
+            - name: MONGO_CONNECTION_STRING
+              value: mongodb://$(MONGODB_ROOT_USER):$(MONGODB_ROOT_PASSWORD)@$(MONGODB_SERVICE_NAME)/cte?replicaSet=rs1&authSource=admin
+            - name: RABBITMQ_CONNECTION_STRING
+              value: amqp://user:$(RABBITMQ_PASSWORD)@netskope-ce-rabbitmq-stats-headless;amqp://user:$(RABBITMQ_PASSWORD)@netskope-ce-rabbitmq-disc1-headless
+          image: <CORE_IMAGE_NAME>
+          name: netskope-ce-worker
+          securityContext:
+            runAsNonRoot: true
+          ports:
+            - containerPort: 8000
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            failureThreshold: 6
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            failureThreshold: 6
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 20
+          resources:
+            limits:
+              memory: 4Gi
+              cpu: 2000m
+            requests:
+              memory: 2Gi
+              cpu: 1000m
+          volumeMounts:
+            - mountPath: /opt/netskope/plugins/custom_plugins
+              name: netskope-ce-worker-plugins-vol
+      restartPolicy: Always
+      serviceAccount: <SERVICEACCOUNT_NAME>
+      volumes:
+        - name: netskope-ce-worker-plugins-vol
+          configMap:
+            name: netskope-ce-core-custom-plugins
+            defaultMode: 420
