@@ -1,0 +1,152 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/name: rabbitmq-stats
+  name: netskope-ce-rabbitmq-stats
+  namespace: <NAMESPACE_NAME>
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rabbitmq-stats
+  serviceName: netskope-ce-rabbitmq-stats-headless
+  template:
+    metadata:
+      labels:
+        network.kubernetes.io/app-tier: "true"
+        app.kubernetes.io/name: rabbitmq-stats
+      namespace: <NAMESPACE_NAME>
+    spec:
+      initContainers:
+        - name: volume-permissions
+          image: busybox:latest
+          command:
+            - sh
+          args:
+            - -ec
+            - |
+              mkdir -p /bitnami/rabbitmq/mnesia
+              chown -R 1001:1001 /bitnami/rabbitmq/mnesia
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: netskope-ce-rabbitmq-stats-datadir
+              mountPath: /bitnami/rabbitmq/mnesia
+      containers:
+        - env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: K8S_SERVICE_NAME
+              value: netskope-ce-rabbitmq-stats-headless
+            - name: BITNAMI_DEBUG
+              value: "true"
+            - name: RABBITMQ_DISK_FREE_ABSOLUTE_LIMIT
+              value: "1"
+            - name: RABBITMQ_ERL_COOKIE
+              valueFrom:
+                secretKeyRef:
+                  key: rabbitmq-erl-cookie
+                  name: netskope-ce-rabbitmq
+            - name: RABBITMQ_NODE_NAME
+              value: rabbit@$(MY_POD_NAME).$(K8S_SERVICE_NAME).$(MY_POD_NAMESPACE).svc.cluster.local
+            - name: RABBITMQ_NODE_TYPE
+              value: stats
+            - name: RABBITMQ_USE_LONGNAME
+              value: "true"
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: rabbitmq-password
+                  name: netskope-ce-rabbitmq
+            - name: RABBITMQ_SECURE_PASSWORD
+              value: "yes"
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/bash
+                  - -ec
+                  - |
+                    if [[ -f /opt/bitnami/scripts/rabbitmq/nodeshutdown.sh ]]; then
+                        /opt/bitnami/scripts/rabbitmq/nodeshutdown.sh -t "120" -d "false"
+                    else
+                        rabbitmqctl stop_app
+                    fi
+          image: <RABBITMQ_IMAGE_NAME>
+          name: netskope-ce-rabbitmq-stats
+          securityContext:
+            runAsNonRoot: true
+            privileged: true
+          ports:
+            - containerPort: 5672
+              name: amqp
+              protocol: TCP
+            - containerPort: 25672
+              name: dist
+              protocol: TCP
+            - containerPort: 15672
+              name: stats
+              protocol: TCP
+            - containerPort: 4369
+              name: epmd
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -ec
+                - rabbitmq-diagnostics -q ping
+            failureThreshold: 6
+            initialDelaySeconds: 120
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 20
+          readinessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -ec
+                - rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 20
+          resources:
+            limits:
+              memory: 1024Mi
+              cpu: 1000m
+            requests:
+              memory: 128Mi
+              cpu: 500m
+          volumeMounts:
+            - mountPath: /bitnami/rabbitmq/mnesia
+              name: netskope-ce-rabbitmq-stats-datadir
+            - mountPath: /bitnami/rabbitmq/conf/custom.conf
+              name: netskope-ce-rabbitmq-config-vol
+              subPath: custom.conf
+      restartPolicy: Always
+      serviceAccount: <SERVICEACCOUNT_NAME>
+      volumes:
+        - name: netskope-ce-rabbitmq-config-vol
+          configMap:
+            name: netskope-ce-rabbitmq-config
+  volumeClaimTemplates:
+    - metadata:
+        name: netskope-ce-rabbitmq-stats-datadir
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: <STORAGE_CLASS>
+        resources:
+          requests:
+            storage: 1Gi
