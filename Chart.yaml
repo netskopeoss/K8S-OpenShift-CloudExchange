@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: 1.0.0
+description: A Helm Chart to setup production environment of Netskope-CE.
+name: netskope-ce
+type: application
+version: 1.0.0

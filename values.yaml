@@ -1,0 +1,358 @@
+## @param commonLabels Add labels to all the deployed resources (sub-charts are not considered). Evaluated as a template
+##
+commonLabels: {}
+## @param commonAnnotations Common annotations to add to all resources. Evaluated as a template
+##
+commonAnnotations: {}
+## @param namespace which all resources are running in
+##
+namespace: ""
+## ServiceAccount
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  ## @param serviceAccount.create Enable creation of ServiceAccount for all pods.
+  ##
+  create: true
+  ## @param serviceAccount.name Name of the created serviceAccount
+  ## If not set and create is true, a name is generated using the .Chart.Name-serviceaccount template
+  ##
+  name: ""
+  ## @param serviceAccount.annotations Additional Service Account annotations
+  ##
+  annotations: {}
+  ## @param serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+  ## Can be set to false if pods using this serviceAccount do not need to use K8s API
+  ##
+  automountServiceAccountToken: false
+## Private image registry
+##
+privateImageRegistry:
+  ## @param.privateImageRegistry.imagePullSecrets if your image registry is private, in that case you have to pass imagePullSecrets
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## Example:
+  ## imagePullSecrets:
+  ##   - myImagePullSecretName
+  imagePullSecrets: []
+## @param updateStrategy.type Strategy to use to replace existing pods.
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+## Example:
+## updateStrategy:
+##  type: RollingUpdate
+##  rollingUpdate:
+##    maxSurge: 25%
+##    maxUnavailable: 25%
+##
+updateStrategy:
+  type: RollingUpdate
+## MonogDB params
+##
+mongodb:
+  ## @param mongodb.labels Additional labels to be added to the MongoDB statefulset.
+  ##
+  labels: {}
+  ## @param mongodb.annotations Additional annotations to be added to the MongoDB statefulset.
+  ##
+  annotations: {}
+  ## @param mongodb.image docker image of mongodb statefulset
+  ##
+  image: index.docker.io/mongo:5.0.0
+  ## Init Container
+  ##
+  initContainers:
+    ## Volume mount permission container.
+    ##
+    volumePermissionContainer:
+      ## @param mongodb.initContainer.volumePermissionContainer.create creates init containers will use for change the mount volume permission and ownership
+      ##
+      create: true
+  ## @param mongodb.resources resources request and limit for mongodb
+  ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    limits:
+      memory: 2Gi
+      cpu: 1000m
+    requests:
+      memory: 512Mi
+      cpu: 500m
+  ## @param mongodb.replicaCount no of replica of mongodb
+  ##
+  replicaCount: 3
+  ## Security Context for mongodb
+  ##
+  securityContext:
+    ## @param mongodb.securityContext.privileged Privileged containers can allow almost completely unrestricted host access
+    ##
+    privileged: false
+    ## @param mongodb.securityContext.allowPrivilegeEscalation Enable privilege escalation
+    ## it should be true if privileged is set to true.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+    ##
+    allowPrivilegeEscalation: false
+  ## Persistence using Persistent Volume Claims
+  ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  persistence:
+    ## @param mongodb.persistence.size PVC Storage Request for MongoDB data volume
+    ##
+    size: 3Gi
+    ## @param mongodb.persistence.storageClassName PVC Storage Class for MongoDB data volume
+    ##
+    storageClassName: manual
+    ## @param mongodb.persistence.annotations PVC annotations
+    ##
+    annotations: {}
+  ## MongoDB Secrets
+  ##
+  auth:
+    ## @param mongodb.auth.rootUser MongoDB root username
+    ##
+    rootUser: "root"
+    ## @param mongodb.auth.rootPassword MongoDB root password
+    ##
+    rootPassword: ""
+    ## @param mongodb.auth.cteAdminUser MongoDB root username
+    ##
+    cteAdminUser: "cteadmin"
+    ## @param mongodb.auth.cteAdminPassword MongoDB root password
+    ##
+    cteAdminPassword: ""
+## RabbitMQ Params (For Stats and Disc both)
+##
+rabbitmq:
+  ## @param rabbitmq.labels Additional labels to be added to the RabbitMQ statefulset.
+  ##
+  labels: {}
+  ## @param rabbitmq.annotations Additional annotations to be added to the RabbitMQ statefulset.
+  ##
+  annotations: {}
+  ## @param rabbitmq.image docker image of rabbitmq statefulset
+  ##
+  image: index.docker.io/rabbitmq:3.9-management
+  ## @param rabbitmq.replicaCount no of replica of rabbitmq
+  ##
+  replicaCount: 3
+  ## @param rabbitmq.resources resources request and limit for rabbitmq
+  ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    limits:
+      memory: 2Gi
+      cpu: 1000m
+    requests:
+      memory: 2Gi
+      cpu: 500m
+  ## Security Context for rabbitmq
+  ##
+  securityContext:
+    ## @param rabbitmq.securityContext.privileged Privileged containers can allow almost completely unrestricted host access
+    ##
+    privileged: false
+    ## @param rabbitmq.securityContext.allowPrivilegeEscalation Enable privilege escalation
+    ## it should be true if privileged is set to true.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+    ##
+    allowPrivilegeEscalation: false
+  ## Persistence using Persistent Volume Claims
+  ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  persistence:
+    ## @param rabbitmq.persistence.size PVC Storage Request for RabbitMQ data volume
+    ##
+    size: 3Gi
+    ## @param rabbitmq.persistence.storageClassName PVC Storage Class for RabbitMQ data volume
+    ##
+    storageClassName: manual
+    ## @param rabbitmq.persistence.annotations PVC annotations
+    ##
+    annotations: {}
+  ## RabbitMQ Secrets
+  ##
+  auth:
+    ## @param rabbitmq.auth.rabbitmqDefaultUser RabbitMQ Default User
+    ##
+    rabbitmqDefaultUser: "user"
+    ## @param rabbitmq.auth.rabbitmqDefaultPassword RabbitMQ password
+    ##
+    rabbitmqDefaultPassword: ""
+## Core Params
+##
+core:
+  ## @param core.labels Additional labels to be added to the Core deployment.
+  ##
+  labels: {}
+  ## @param core.annotations Additional annotations to be added to the Core deployment.
+  ##
+  annotations: {}
+  ## Init Container
+  ##
+  initContainers:
+    ## Volume mount permission container.
+    ##
+    volumePermissionContainer:
+      ## @param core.initContainer.volumePermissionContainer.create creates init containers will use for change the mount volume permission and ownership
+      ##
+      create: true
+  ## Role Based Access only for core
+  ## ref: https://kubernetes.io/docs/admin/authorization/rbac/
+  ##
+  rbac:
+    ## @param rbac.create Whether to create & use RBAC resources or not
+    ## binding ServiceAccount to a role
+    ## that allows pods querying the K8s API
+    ##
+    create: true
+    ## @param core.rbac.rules Custom rules to create following the role specification
+    ## rules:
+    ##   - apiGroups:
+    ##       - ""
+    ##     resources:
+    ##       - pods
+    ##     verbs:
+    ##       - get
+    ##       - list
+    ##       - watch
+    ##       - update
+    ##
+    rules: []
+  ## @param core.image docker image of core deployment
+  ##
+  image: netskopetechnicalalliances/cloudexchange:core4-latest
+  ## @Replica Count for Worker
+  ##
+  replicaCount:
+    ## @param core.replicaCount.core Number of replica count for core
+    ##
+    core: 1
+    ## @param core.replicaCount.worker Number of replica count for worker
+    ##
+    worker: 0
+  ## HTTP Proxy
+  ##
+  httpProxy:
+    ## @param core.httpProxy.enable to enable http proxy in core
+    ##
+    enable: false
+    ## @param core.httpProxy.url HTTP Proxy URL
+    ##
+    url: ""
+  ## HTTPS Proxy
+  ##
+  httpsProxy:
+    ## @param core.httpsProxy.enable to enable https proxy in core
+    ##
+    enable: false
+    ## @param core.httpsProxy.url HTTPS Proxy URL
+    ##
+    url: ""
+  ## @param core.resources resources request and limit for core
+  ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    limits:
+      memory: 4Gi
+      cpu: 4000m
+    requests:
+      memory: 2Gi
+      cpu: 2000m
+  ## Security Context for core
+  ##
+  securityContext:
+    ## @param core.securityContext.privileged Privileged containers can allow almost completely unrestricted host access
+    ##
+    privileged: false
+    ## @param core.securityContext.allowPrivilegeEscalation Enable privilege escalation
+    ## it should be true if privileged is set to true.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+    ##
+    allowPrivilegeEscalation: false
+  ## Persistence using Persistent Volume Claims
+  ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+  ##
+  persistence:
+    ## @param core.persistence.size PVC Storage Request for RabbitMQ data volume
+    ##
+    size: 3Gi
+    ## @param core.persistence.storageClassName PVC Storage Class for RabbitMQ data volume
+    ##
+    storageClassName: manual
+    ## @param core.persistence.annotations PVC annotations
+    ##
+    annotations: {}
+  ## CA Certifates Enable the private CA certificate
+  ##
+  caCertificate: false
+  ## Core Secrets
+  ##
+  auth:
+    ## @param core.auth.analyticsToken Analytics Token
+    ##
+    analyticsToken: ""
+    ## @param core.auth.jwtToken JWT Token
+    ##
+    jwtToken: ""
+## UI Params
+##
+ui:
+  ## @param ui.labels Additional labels to be added to the UI deployment.
+  ##
+  labels: {}
+  ## @param ui.annotations Additional annotations to be added to the UI deployment.
+  ##
+  annotations: {}
+  ## Role Based Access only for mongodb
+  ## ref: https://kubernetes.io/docs/admin/authorization/rbac/
+  ##
+  rbac:
+    ## @param ui.rbac.create Whether to create & use RBAC resources or not
+    ## binding ServiceAccount to a role
+    ## that allows pods querying the K8s API
+    ##
+    create: true
+    ## @param rbac.rules Custom rules to create following the role specification
+    ## rules:
+    ##   - apiGroups:
+    ##       - ""
+    ##     resources:
+    ##       - pods
+    ##     verbs:
+    ##       - get
+    ##       - list
+    ##       - watch
+    ##       - update
+    ##
+    rules: []
+  ## @param ui.image docker image of UI deployment
+  ##
+  image: netskopetechnicalalliances/cloudexchange:ui4-latest
+  ## @param ui.replicaCount no of replica of ui
+  ##
+  replicaCount: 1
+  ## @param ui.ssl to enable SSL certificates
+  ##
+  ssl: false
+  ## @param ui.resources resources request and limit for ui
+  ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    limits:
+      memory: 204Mi
+      cpu: 750m
+    requests:
+      memory: 102Mi
+      cpu: 250m
+  ## Security Context for ui
+  ##
+  securityContext:
+    ## @param ui.securityContext.privileged Privileged containers can allow almost completely unrestricted host access
+    ##
+    privileged: false
+    ## @param ui.securityContext.allowPrivilegeEscalation Enable privilege escalation
+    ## it should be true if privileged is set to true.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+    ##
+    allowPrivilegeEscalation: false
+

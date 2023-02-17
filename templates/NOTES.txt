@@ -1,0 +1,8 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ include "namespace.name" . }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ include "namespace.name" . }}
+  $ helm get all {{ include "namespace.name" . }}
