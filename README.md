@@ -1,4 +1,4 @@
-# Deploying Netskope Cloud Exchange using Helm
+# Deploying Netskope Cloud Exchange using Helm Charts
 
 The Netskope Cloud Exchange (CE) provides customers with powerful integration tools to leverage investments across their security posture.
 
