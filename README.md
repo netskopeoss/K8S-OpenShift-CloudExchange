@@ -5,7 +5,7 @@ The Netskope Cloud Exchange (CE) provides customers with powerful integration to
 
 Cloud Exchange consumes valuable Netskope telemetry and external threat intelligence and risk scores, enabling improved policy implementation, automated service ticket creation, and exportation of log events from the Netskope Security Cloud.
 
-To learn more about Netskope Cloud Exchange please refer to the Netskope Cloud Exchange introduction page.
+To learn more about Netskope Cloud Exchange please refer to the [Netskope Cloud Exchange](https://www.netskope.com/products/capabilities/cloud-exchange) introduction page.
 </div>
 
 ## Prerequisites 
@@ -86,7 +86,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `mongodb.image`          | Docker image of MongoDB statefulset                                                                       | `index.docker.io/mongo:5.0` | No          |
 | `mongodb.initContainers.volumePermissionContainer.create` | Creates init containers will use for change the mount volume permission and ownership | `false`           | No          |
 | `mongodb.resources`      | Resources request and limit for MongoDB (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 2Gi <br/> cpu: 1000m <br/>requests: <br> memory: 512Mi <br> cpu: 500m </pre> | No          |
-| `mongodb.replicaCount`   | No of replica of MongoDB                                                                                  | `3`             | No          |        
+| `mongodb.replicaCount`   | No. of replica of MongoDB                                                                                  | `3`             | No          |        
 | `mongodb.securityContext.privileged` | Privileged containers can allow almost completely unrestricted host access                    | `false`         | No          |
 | `mongodb.securityContext.allowPrivilegeEscalation` | Enable privilege escalation, it should be true if privileged is set to true.    | `false`         | No          |
 | `mongodb.persistence.size` | PVC Storage Request for MongoDB data volume                                                             | `3Gi`           | No          |
@@ -95,8 +95,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | `mongodb.auth.replicaSetKey` | Key used for authentication in the replicaset                                                         | `""`            | Yes         |
 | `mongodb.auth.rootUser` | MongoDB root username                                                                                      | `""`            | Yes         |   
 | `mongodb.auth.rootPassword` | MongoDB root password                                                                                  | `""`            | Yes         |
-| `mongodb.auth.cteAdminUser` | MongoDB CteAdmin User          | `""`            | Yes         |
-| `mongodb.auth.cteAdminPassword` | MongoDB cteAdmin password                                                                   | `""`            | Yes         |
+| `mongodb.auth.cteAdminUser` | MongoDB cteAdmin User          | `""`            | Yes         |
+| `mongodb.auth.cteAdminPassword` | MongoDB cteAdminPassword password                                                                   | `""`            | Yes         |
 
 ### RabbitMQ Configurations
 | Name                     | Description                                                                                               | Default Value           | Required    |
@@ -104,7 +104,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `rabbitmq.labels`        | Additional labels to be added to the RabbitMQ statefulset                                            | `{}`            | No          |
 | `rabbitmq.annotations`    | Additional annotations to be added to the RabbitMQ statefulset                                           | `{}`            | No          |
 | `rabbitmq.image`         | Docker image of RabbitMQ statefulset                                                                      | `index.docker.io/rabbitmq:3.9-management` | No          |
-| `rabbitmq.replicaCount`         | No of replica of RabbitMQ                                                                      | `3` | No          |  
+| `rabbitmq.replicaCount`         | No. of replica of RabbitMQ                                                                      | `3` | No          |  
 | `rabbitmq.resources`     | Resources request and limit for RabbitMQ (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 2Gi <br/> cpu: 1000m <br/>requests: <br> memory: 2Gi <br> cpu: 500m </pre> |  No          |       
 | `rabbitmq.securityContext.privileged` | Privileged containers can allow almost completely unrestricted host access                   | `false`         | No          |
 | `rabbitmq.securityContext.allowPrivilegeEscalation` | Enable privilege escalation, it should be true if privileged is set to true    | `false`         | No          |
@@ -125,8 +125,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | `core.rbac.create`       | Whether to create & use RBAC resources or not, binding ServiceAccount to a role                           | `true`          | No          |
 | `core.rbac.rules`        | Custom rules to create following the role specification                                                   | `[]`            | No          |
 | `core.image`             | Docker image of Core                                                                                      | `netskopetechnicalalliances/cloudexchange:core4-latest` | No          |
-| `core.replicaCount.core` | Number of replica count for Core                                                                          | `1`             | No          |
-| `core.replicaCount.worker` | Number of replica count for Worker                                                                      | `0`             | No          |
+| `core.replicaCount.core` | No. of replica count for Core                                                                          | `1`             | No          |
+| `core.replicaCount.worker` | No. of replica count for Worker                                                                      | `0`             | No          |
 | `core.httpProxy.enable`  | To enable http proxy in Core                                                                              | `false`         | No          |
 | `core.httpProxy.url`     | HTTP Proxy URL                                                                                            | `""`            | If `core.httpProxy.enable: true` |
 | `core.httpsProxy.enable` | To enable https proxy in Core                                                                             | `false`         | No
@@ -150,7 +150,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `ui.rbac.create`         | Whether to create & use RBAC resources or not, binding ServiceAccount to a role                           | `true`          | No          |
 | `ui.rbac.rules`          | Custom rules to create following the role specification                                                   | `[]`            | No          |
 | `ui.image`               | Docker image of UI                                                                                        | `netskopetechnicalalliances/cloudexchange:ui4-latest` | No
-| `ui.replicaCount`        | No of replica of UI                                                                                      | `1`             | No          |
+| `ui.replicaCount`        | No. of replica of UI                                                                                      | `1`             | No          |
 | `ui.ssl`                 | To enable SSL certificates                                                                                | `false`          | No          |
 | `ui.resources`           | Resources request and limit for UI (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 204Mi <br/> cpu: 750m <br/>requests: <br> memory: 102Mi <br> cpu: 250m </pre> | No           |
 | `ui.securityContext.privileged` | Privileged containers can allow almost completely unrestricted host access                         | `false`         | No          |
@@ -160,7 +160,7 @@ The command removes all the Kubernetes components associated with the chart and 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
 ```bash
-$ helm install my-release --set mongodb.auth.rootPassword=secretpassword .
+$ helm install my-release . --set mongodb.auth.rootPassword=secretpassword 
 ```
 
 The above command sets the MongoDB `root` account password to `secretpassword`.
