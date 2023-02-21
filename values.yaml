@@ -58,7 +58,7 @@ mongodb:
   annotations: {}
   ## @param mongodb.image docker image of mongodb statefulset
   ##
-  image: index.docker.io/mongo:5.0.0
+  image: index.docker.io/mongo:5.0
   ## Init Container
   ##
   initContainers:
@@ -232,20 +232,11 @@ core:
     worker: 0
   ## HTTP Proxy
   ##
-  httpProxy:
-    ## @param core.httpProxy.enable to enable http proxy in core
+  proxy:
+    ## @param core.proxy.enable to enable proxy in core
     ##
     enable: false
-    ## @param core.httpProxy.url HTTP Proxy URL
-    ##
-    url: ""
-  ## HTTPS Proxy
-  ##
-  httpsProxy:
-    ## @param core.httpsProxy.enable to enable https proxy in core
-    ##
-    enable: false
-    ## @param core.httpsProxy.url HTTPS Proxy URL
+    ## @param core.proxy.url Proxy URL
     ##
     url: ""
   ## @param core.resources resources request and limit for core

@@ -114,13 +114,13 @@ spec:
               value: {{ .Values.core.image }}
             - name: ENABLE_CELERY_BEAT
               value: "true"
-            {{- if .Values.core.httpProxy.enable }}
+            {{- if .Values.core.proxy.enable }}
             - name: HTTP_PROXY
-              value: {{ required "HTTP Proxy URL cannot be empty" .Values.core.httpProxy.url }}
+              value: {{ required "Proxy URL cannot be empty" .Values.core.proxy.url }}
             {{- end }}
-            {{- if .Values.core.httpsProxy.enable }}
+            {{- if .Values.core.proxy.enable }}
             - name: HTTPS_PROXY
-              value: {{ required "HTTPS Proxy URL cannot be empty" .Values.core.httpsProxy.url }}
+              value: {{ required "Proxy URL cannot be empty" .Values.core.proxy.url }}
             {{- end }} 
             - name: JWT_ALGORITHM
               value: HS256
@@ -180,8 +180,8 @@ spec:
               drop:
                 - ALL
           volumeMounts:
-            {{- if .Values.caCertificate }}
-            - name: {{ printf "%s-ui-ssl-ca-cert-volume" .Chart.Name }}
+            {{- if .Values.core.caCertificate }}
+            - name: {{ printf "%s-ca-cert-volume" .Chart.Name }}
               mountPath: /usr/local/share/ca-certificates/ca.pem
               subPath: ca.pem
               readOnly: true
@@ -209,8 +209,8 @@ spec:
         - name: {{ printf "%s-core-custom-plugins-config-volume" .Chart.Name }}
           persistentVolumeClaim:
             claimName: {{ printf "%s-core-custom-plugins-config-volume-pvc" .Chart.Name }}
-        {{- if .Values.caCertificate }}
-        - name: {{ printf "%s-ui-ssl-ca-cert-volume" .Chart.Name }}
+        {{- if .Values.core.caCertificate }}
+        - name: {{ printf "%s-ca-cert-volume" .Chart.Name }}
           secret:
             secretName: {{ printf "%s-ca-certificate-secret" .Chart.Name }}
         {{- end }}

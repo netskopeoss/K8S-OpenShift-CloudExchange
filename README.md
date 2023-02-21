@@ -13,27 +13,27 @@ The following prerequisites are required to deploy the Netskope Cloud Exchange u
 - `K8s` cluster (EKS, OpenShift, etc.) is required to deploy Netskope CE on that.
 - `kubectl` must be installed on your machine.
 - `helm` must be installed on your machine.
-- Namespace should be created before we deploy helm chart.
+- Namespace should be created before we deploy the helm chart.
 - PV provisioner support in the underlying infrastructure.
 - Please refer to the section [Package Sizing Matrix](#package-sizing-matrix) before proceeding deployment. 
 
 ## Deploying the Netskope CE Helm Chart
-> **FYI:** A `Release` is an instance of a chart running in a Kubernetes cluster. One chart can often be installed many times into the same cluster. And each time it is installed, a new release is created. The release name should contain lower-letters, numbers and hyphens only.
+> **FYI:** A `Release` is an instance of a chart running in a Kubernetes cluster. One chart can often be installed many times into the same cluster. And each time it is installed, a new release is created. The release name should contain lower-letters, numbers, and hyphens only.
 
-Before install the actual product helm chart we have to deploy Kubernetes operator for the MongoDB and RabbitMQ.
+Before installing the actual product helm chart, we have to deploy the Kubernetes operator for MongoDB and RabbitMQ.
 > **Note:** If we are deploying the helm chart on the `Openshift` at that time we will have to provide privileged access to some service accounts before the deploy helm chart. We have mentioned those service account names here `mongodb-database`, `mongodb-kubernetes-operator`, `netskope-ce-rabbitmqcluster-server`, `rabbitmq-operator-rabbitmq-cluster-operator`, `rabbitmq-operator-rabbitmq-messaging-topology-operator` and the service account that you are providing (if you are not providing the service account then provide the privileged access to this `netskope-ce-serviceaccount` that we are creating by default). Skip this step if you are not on the `Openshift`.
 To provide the privileged access to the above service accounts, run the below command.
 ```
 oc adm policy add-scc-to-user privileged system:serviceaccount:netskope:<service-account-name>
 ```
 
-To install MongoDB kubernetes operator 
+To install MongoDB kubernetes operator: 
 ```
 helm repo add mongodb https://mongodb.github.io/helm-charts 
 helm install community-operator mongodb/community-operator -n <namespace-name>
 ```
 
-To install RabbitMQ kubernetes operator
+To install RabbitMQ kubernetes operator:
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install rabbitmq-operator bitnami/rabbitmq-cluster-operator -n <namespace-name>
@@ -43,11 +43,11 @@ To install the chart:
 ```bash
 $ helm install <release-name> . -n <namespace-name>
 ```
-For example, install chart with release name `my-release`
+For example, installing the chart with release name `my-release`:
 ```
 helm install my-release . -n <namespace-name>
 ```
-The above commnad deploys Netskope Cloud Exchange. The [Configurations](#configurations) section lists the parameters that can be configured during installation.
+The above command deploys Netskope Cloud Exchange. The [Configurations](#configurations) section lists the parameters that can be configured during installation.
 
 > **Tip**: List all releases using `helm list`
 
@@ -56,7 +56,7 @@ To uninstall/delete the deployment:
 ```bash
 helm delete <release-name> -n <namespace-name>
 ```
-For example, uninstall chart with release name `my-release`
+For example, uninstalling the chart with release name `my-release`:
 ```
 helm uninstall my-release -n <namespace-name>
 ```
@@ -114,8 +114,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | `rabbitmq.auth.rabbitmqDefaultUser` | RabbitMQ Default User                          | `""`            | Yes         |
 | `rabbitmq.auth.rabbitmqPassword` | RabbitMQ password                                                                                 | `""`            | Yes         |
 
-> Note: If CA cert enabled then CA certifiate (Default: `false`) should be present in `ca-certifiates` directory with `ca.pem` file name.
-
 ### Core Configurations
 | Name                     | Description                                                                                               | Default Value           | Required    |
 | ------------------------ | --------------------------------------------------------------------------------------------------------- | --------------- | ----------- |
@@ -127,10 +125,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | `core.image`             | Docker image of Core                                                                                      | `netskopetechnicalalliances/cloudexchange:core4-latest` | No          |
 | `core.replicaCount.core` | No. of replica count for Core                                                                          | `1`             | No          |
 | `core.replicaCount.worker` | No. of replica count for Worker                                                                      | `0`             | No          |
-| `core.httpProxy.enable`  | To enable http proxy in Core                                                                              | `false`         | No          |
-| `core.httpProxy.url`     | HTTP Proxy URL                                                                                            | `""`            | If `core.httpProxy.enable: true` |
-| `core.httpsProxy.enable` | To enable https proxy in Core                                                                             | `false`         | No
-| `core.httpsProxy.url`    | HTTPS Proxy URL                                                                                           | `""`            | If `core.httpsProxy.enable: true` | 
+| `core.proxy.enable`  | To enable proxy in Core                                                                              | `false`         | No          |
+| `core.proxy.url`     | Proxy URL                                                                                            | `""`            | If `core.proxy.enable: true` |
 | `core.resources`         | Resources request and limit for Core (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                   |  <pre>limits: <br/> memory: 4Gi <br/> cpu: 4000m <br/>requests: <br> memory: 2Gi <br> cpu: 2000m </pre> | No            |            
 | `core.securityContext.privileged` | Privileged containers can allow almost completely unrestricted host access                       | `false`         | No          |
 | `core.securityContext.allowPrivilegeEscalation` | Enable privilege escalation, it should be true if privileged is set to true        | `false`         | No          |
@@ -141,7 +137,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | `core.auth.analyticsToken` | Analytics Token                                                                                         | `""`            | Yes         |
 | `core.auth.jwtToken` | JWT Token                                                                                                     | `""`            | Yes         |
 
-> Note: If you enable SSL certificates (Default: `false`), in this case your SSL certificates must be present at `certificates` dir at root and certificate and certificate private key with respective name `cte_cert.key` and  `cte_cert_key.key`.
+> Note: If the `core.caCertificate` attribute is enabled (Default: false) then the CA certificate should be present in the `ca-certificates` directory with the `ca.pem` file name.
+
 ### UI Configurations
 | Name                     | Description                                                                                               | Default Value           | Required    |
 | ------------------------ | --------------------------------------------------------------------------------------------------------- | --------------- | ----------- |
@@ -155,6 +152,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | `ui.resources`           | Resources request and limit for UI (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 204Mi <br/> cpu: 750m <br/>requests: <br> memory: 102Mi <br> cpu: 250m </pre> | No           |
 | `ui.securityContext.privileged` | Privileged containers can allow almost completely unrestricted host access                         | `false`         | No          |
 | `ui.securityContext.allowPrivilegeEscalation` | Enable privilege escalation, it should be true if privileged is set to true.         | `false`         | No          |
+
+> Note: If you enable `ui.ssl` certificates (Default: false), your SSL certificates and certificate & certificate private key (with the respective names `cte_cert.key` and `cte_cert_key.key`) must be present in the certificates directory at the root.
 
 ## Override the Default Values
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
@@ -179,7 +178,7 @@ To override, update the [sample-values-override.yaml](./sample-values-override.y
 ```bash
 $ helm upgrade my-release -f sample-values-override.yaml . -n <namespace-name>
 ```
-> **Note:** There could be more values that could be needed to be overridden by the end user based on their use case. For that, please add respective configurations in the sample-overrides- file before running the below command. The sample-override file is just for end user's fundamental reference.
+> **Note:** There could be more values that could be needed to be overridden by the end-user based on their use case. For that, please add respective configurations in the sample-overrides- file before running the below command. The sample-override file is just for the end user's fundamental reference.
 ## Accessing Netskope CE
 To access Netskope CE using port forward, run the below command.
 
@@ -215,7 +214,7 @@ Install AWS EFS CSI Driver in the Kubernetes cluster (in this case Amazon EKS cl
 
 https://github.com/kubernetes-sigs/aws-efs-csi-driver
 
-> **Note:** Based on the current latest version of AWS EFS CSI Driver (v1.4.3), the Kubernetes version should be `>=v1.17`. Though at any point in time the compatibility versions of Kubernetes and AWS EFS CSI Driver can be identified from the above link.
+> **Note:** Based on the current latest version of AWS EFS CSI Driver (v1.4.3), the Kubernetes version should be `>=v1.17`. Though at any point in time, the compatibility versions of Kubernetes and AWS EFS CSI Driver can be identified from the above link.
 
 ### Step 3
 Create `StorageClass` in the Kubernetes deployment YAML file as mentioned below. In that StorageClass `directoryPerms` should be `700` and `gid` and `uid` should be `1001`.
@@ -246,7 +245,7 @@ rabbitmq:
 ```
 
 ### Step 5
-Install the helm chart by following the step mentioned in the above section [here](#deploying-the-netskope-ce-helm-chart).
+Install the helm chart by following the steps mentioned in the above section [here](#deploying-the-netskope-ce-helm-chart).
 
 ## Package Sizing Matrix
 This section depicts the required CPUs and Memory for Containers based on the Netskope Cloud Exchange Package Types depending on their use case.
@@ -272,5 +271,5 @@ This section depicts the container orchestration platforms and CE version on whi
 | ---------------| --------------------------------------------------- | ------- |
 | Core           | [netskopetechnicalalliances/cloudexchange:core4-latest](https://hub.docker.com/layers/netskopetechnicalalliances/cloudexchange/core4-latest/images/sha256-50fb52d40ab3722fb3f269afe03ff588d0b21349b4d962d64168b9465c205126?context=explore) | 4.1.0        | 
 | UI           | [netskopetechnicalalliances/cloudexchange:ui4-latest](https://hub.docker.com/layers/netskopetechnicalalliances/cloudexchange/ui4-latest/images/sha256-1bddc684f34ac6d9a402c2cab41b690ecce87932e25324f34568d3f5a0119122?context=explore) | 4.1.0        | 
-| MongoDB        | [index.docker.io/mongo:5.0.0](https://hub.docker.com/layers/library/mongo/5.0.0/images/sha256-6482b51d0de718dc17aa087e321057559eafdcdf986f8d8e41446ec8b41c0fc5?context=explore) | 5.0.0        | 
+| MongoDB        | [index.docker.io/mongo:5.0](https://hub.docker.com/layers/library/mongo/5.0/images/sha256-a8fae999d4720fc72cc39e83c5ebfdc1602cca6701ab0569f7c1a1f3c9715c77?context=explore) | 5.0        | 
 | RabbitMQ        | [index.docker.io/rabbitmq:3.9-management](https://hub.docker.com/layers/library/rabbitmq/3.9-management/images/sha256-b1685db235b7788e9145fc41d3d1e6b26516942111cb1969483aabe7ad45ba8f?context=explore) | 3.9-management | 
