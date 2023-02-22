@@ -24,7 +24,7 @@ Before installing the actual product helm chart, we have to deploy the Kubernete
 > **Note:** If we are deploying the helm chart on the `Openshift` at that time we will have to provide privileged access to some service accounts before the deploy helm chart. We have mentioned those service account names here `mongodb-database`, `mongodb-kubernetes-operator`, `netskope-ce-rabbitmqcluster-server`, `rabbitmq-operator-rabbitmq-cluster-operator`, `rabbitmq-operator-rabbitmq-messaging-topology-operator` and the service account that you are providing (if you are not providing the service account then provide the privileged access to this `netskope-ce-serviceaccount` that we are creating by default). Skip this step if you are not on the `Openshift`.
 To provide the privileged access to the above service accounts, run the below command.
 ```
-oc adm policy add-scc-to-user privileged system:serviceaccount:netskope:<service-account-name>
+oc adm policy add-scc-to-user privileged system:serviceaccount:<namespace-name>:<service-account-name>
 ```
 
 To install MongoDB kubernetes operator: 
@@ -83,7 +83,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | ------------------------ | --------------------------------------------------------------------------------------------------------- | --------------- | ----------- |
 | `mongodb.labels`         | Additional labels to be added to the MongoDB statefulset                                             | `{}`            | No          |
 | `mongodb.annotations`    | Additional annotations to be added to the MongoDB statefulset                                             | `{}`            | No          |
-| `mongodb.image`          | Docker image of MongoDB statefulset                                                                       | `index.docker.io/mongo:5.0` | No          |
+| `mongodb.image`          | Docker image of MongoDB statefulset                                                                       | `index.docker.io/mongo:5.0.14` | No          |
 | `mongodb.initContainers.volumePermissionContainer.create` | Creates init containers will use for change the mount volume permission and ownership | `false`           | No          |
 | `mongodb.resources`      | Resources request and limit for MongoDB (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 2Gi <br/> cpu: 1000m <br/>requests: <br> memory: 512Mi <br> cpu: 500m </pre> | No          |
 | `mongodb.replicaCount`   | No. of replica of MongoDB                                                                                  | `3`             | No          |        
@@ -271,5 +271,5 @@ This section depicts the container orchestration platforms and CE version on whi
 | ---------------| --------------------------------------------------- | ------- |
 | Core           | [netskopetechnicalalliances/cloudexchange:core4-latest](https://hub.docker.com/layers/netskopetechnicalalliances/cloudexchange/core4-latest/images/sha256-50fb52d40ab3722fb3f269afe03ff588d0b21349b4d962d64168b9465c205126?context=explore) | 4.1.0        | 
 | UI           | [netskopetechnicalalliances/cloudexchange:ui4-latest](https://hub.docker.com/layers/netskopetechnicalalliances/cloudexchange/ui4-latest/images/sha256-1bddc684f34ac6d9a402c2cab41b690ecce87932e25324f34568d3f5a0119122?context=explore) | 4.1.0        | 
-| MongoDB        | [index.docker.io/mongo:5.0](https://hub.docker.com/layers/library/mongo/5.0/images/sha256-a8fae999d4720fc72cc39e83c5ebfdc1602cca6701ab0569f7c1a1f3c9715c77?context=explore) | 5.0        | 
+| MongoDB        | [index.docker.io/mongo:5.0.14](https://hub.docker.com/layers/library/mongo/5.0.14/images/sha256-a8fae999d4720fc72cc39e83c5ebfdc1602cca6701ab0569f7c1a1f3c9715c77?context=explore) | 5.0.14        | 
 | RabbitMQ        | [index.docker.io/rabbitmq:3.9-management](https://hub.docker.com/layers/library/rabbitmq/3.9-management/images/sha256-b1685db235b7788e9145fc41d3d1e6b26516942111cb1969483aabe7ad45ba8f?context=explore) | 3.9-management | 

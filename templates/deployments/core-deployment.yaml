@@ -145,9 +145,13 @@ spec:
                   name: {{ printf "%s-mongo-cteadmin-connection-string" .Chart.Name }}
                   optional: false
             - name: PULL_THREADS
-              value: "6"
+              value: "4"
             - name: RABBITMQ_CONNECTION_STRING
               value: amqp://user:$(RABBITMQ_PASSWORD)@{{ printf "%s-rabbitmqcluster-nodes" .Chart.Name }}
+            - name: POPEN_TIMEOUT
+              value: "1800"
+            - name: REQUESTS_TIMEOUT
+              value: "300"
           image: {{ .Values.core.image }}
           imagePullPolicy: Always
           name: {{ printf "%s-core" .Chart.Name }}

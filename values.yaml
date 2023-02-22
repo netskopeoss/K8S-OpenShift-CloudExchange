@@ -58,7 +58,7 @@ mongodb:
   annotations: {}
   ## @param mongodb.image docker image of mongodb statefulset
   ##
-  image: index.docker.io/mongo:5.0
+  image: index.docker.io/mongo:5.0.14
   ## Init Container
   ##
   initContainers:
