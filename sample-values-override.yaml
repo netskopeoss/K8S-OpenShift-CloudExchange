@@ -25,6 +25,22 @@ mongodb:
     rootPassword: <>
     cteAdminPassword: <>
 rabbitmq:
+  initContainerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    runAsUser: 1001
+    runAsGroup: 1001
+    capabilities:
+      drop:
+        - ALL
+  containerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    runAsUser: 1001
+    runAsGroup: 1001
+    capabilities:
+      drop:
+        - ALL
   auth:
     rabbitmqDefaultPassword: <>
 core:
