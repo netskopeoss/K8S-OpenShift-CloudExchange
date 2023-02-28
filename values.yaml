@@ -307,18 +307,42 @@ core:
       cpu: 2000m
   ## Security Context for core
   ##
-  securityContext:
-    ## @param core.securityContext.privileged Privileged containers can allow almost completely unrestricted host access
-    ##
-    privileged: false
-    ## @param core.securityContext.allowPrivilegeEscalation Enable privilege escalation
-    ## it should be true if privileged is set to true.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-    ##
-    allowPrivilegeEscalation: false
-  ## Persistence using Persistent Volume Claims
-  ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
-  ##
+  ## @param podSecurityContext Security context
+  podSecurityContext:
+  ## @param initContainerSecurityContext Security context
+  initContainerSecurityContext:
+    # privileged: false
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+  ## @param containerSecurityContext Security context
+  containerSecurityContext:
+    # runAsNonRoot: true
+    # privileged: false
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+  ## @deprecated The securityContext variable has been split three:
+  ## - containerSecurityContext
+  ## - initContainerSecurityContext
+  # securityContext:
+  #   ## @deprecated please use securityContext
+  # securityContext:
+  #   ## @deprecated
+  #   ## @param core.securityContext.privileged Privileged containers can allow almost completely unrestricted host access
+  #   ##
+  #   privileged: false
+  #   ## @param core.securityContext.allowPrivilegeEscalation Enable privilege escalation
+  #   ## it should be true if privileged is set to true.
+  #   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  #   ##
+  #   ## @deprecated
+  #   allowPrivilegeEscalation: false
+  # ## Persistence using Persistent Volume Claims
+  # ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+  # ##
   persistence:
     ## @param core.persistence.size PVC Storage Request for RabbitMQ data volume
     ##

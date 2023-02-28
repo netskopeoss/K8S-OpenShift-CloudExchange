@@ -53,6 +53,19 @@ core:
     requests:
       memory: 2Gi
       cpu: 2000m
+  initContainerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  containerSecurityContext:
+    runAsNonRoot: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
   auth:
     analyticsToken: <>
     jwtToken: <>

@@ -28,15 +28,15 @@ spec:
         template:
           spec:
             securityContext:
-              {{- toYaml .Values.mongodb.podSecurityContext | nindent 14 }} 
+              {{- toYaml .Values.rabbitmq.podSecurityContext | nindent 14 }} 
             initContainers:
               - name: setup-container
                 securityContext:
-                  {{- toYaml .Values.mongodb.initContainerSecurityContext | nindent 18 }}
+                  {{- toYaml .Values.rabbitmq.initContainerSecurityContext | nindent 18 }}
             containers:
               - name: rabbitmq
                 securityContext:
-                  {{- toYaml .Values.mongodb.containerSecurityContext | nindent 18 }}
+                  {{- toYaml .Values.rabbitmq.containerSecurityContext | nindent 18 }}
                 env: 
                   - name: RABBITMQ_DEFAULT_USER
                     value: {{ .Values.rabbitmq.auth.rabbitmqDefaultUser }}

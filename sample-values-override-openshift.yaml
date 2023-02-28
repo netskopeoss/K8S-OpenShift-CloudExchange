@@ -19,10 +19,6 @@ rabbitmq:
   auth:
     rabbitmqDefaultPassword: <>
 core:
-  securityContext:
-    privileged: true
-    allowPrivilegeEscalation: true
-  image: <>
   ## The below given resources are depends on the Package Type.
   resources:
     limits:
@@ -31,6 +27,13 @@ core:
     requests:
       memory: 2Gi
       cpu: 2000m
+  podSecurityContext:
+    runAsUser: 1001380000
+    runAsNonRoot: true
+    fsGroup: 1001380000
+  initContainers:
+    volumePermissionContainer:
+      create: false
   auth:
     analyticsToken: <>
     jwtToken: <>

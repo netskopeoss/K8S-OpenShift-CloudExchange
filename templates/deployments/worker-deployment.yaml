@@ -50,6 +50,8 @@ spec:
         {{- end }}
       {{- end }}
     spec:
+      securityContext:
+        {{- toYaml .Values.core.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init-worker
           env:
@@ -66,11 +68,7 @@ spec:
                 echo waiting for core;sleep 2; 
               done;
           securityContext:
-            privileged: {{ .Values.core.securityContext.privileged }}
-            allowPrivilegeEscalation: {{ .Values.core.securityContext.allowPrivilegeEscalation }}
-            capabilities:
-              drop:
-                - ALL
+            {{- toYaml .Values.core.initContainerSecurityContext | nindent 12 }}
       containers:
         - env:
             - name: UI_SERVICE_NAME
@@ -147,12 +145,7 @@ spec:
             timeoutSeconds: 20
           resources: {{- toYaml .Values.core.resources | nindent 12 }}
           securityContext:
-            runAsNonRoot: true
-            privileged: {{ .Values.core.securityContext.privileged }}
-            allowPrivilegeEscalation: {{ .Values.core.securityContext.allowPrivilegeEscalation }}
-            capabilities:
-              drop:
-                - ALL
+            {{- toYaml .Values.core.containerSecurityContext | nindent 12 }}
           volumeMounts:
             - mountPath: /opt/netskope/plugins/custom_plugins
               name: {{ printf "%s-worker-custom-plugins-config-volume" .Chart.Name }}
