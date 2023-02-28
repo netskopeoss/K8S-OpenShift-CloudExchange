@@ -71,3 +71,16 @@ core:
     jwtToken: <>
 ui:
   image: <>
+  initContainerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  containerSecurityContext:
+    runAsNonRoot: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL

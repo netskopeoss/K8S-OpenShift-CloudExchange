@@ -51,6 +51,8 @@ spec:
         {{- end }}
       {{- end }}
     spec:
+      securityContext:
+        {{- toYaml .Values.ui.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init-ui
           image: busybox:latest
@@ -67,11 +69,7 @@ spec:
                 echo waiting for core;sleep 2; 
               done;
           securityContext:
-            privileged: {{ .Values.ui.securityContext.privileged }}
-            allowPrivilegeEscalation: {{ .Values.ui.securityContext.allowPrivilegeEscalation }}
-            capabilities:
-              drop:
-                - ALL
+            {{- toYaml .Values.ui.initContainerSecurityContext | nindent 12 }}
       containers:
         - env:
             - name: CORE_SERVICE_NAME
@@ -103,12 +101,7 @@ spec:
             timeoutSeconds: 10
           resources: {{- toYaml .Values.ui.resources | nindent 12 }}
           securityContext:
-            runAsNonRoot: true
-            privileged: {{ .Values.ui.securityContext.privileged }}
-            allowPrivilegeEscalation: {{ .Values.ui.securityContext.allowPrivilegeEscalation }}
-            capabilities:
-              drop:
-                - ALL
+            {{- toYaml .Values.ui.containerSecurityContext | nindent 12 }}
           {{- if .Values.ui.ssl }}
           volumeMounts:
             - name: {{ printf "%s-ui-ssl-cert-config-volume" .Chart.Name }}

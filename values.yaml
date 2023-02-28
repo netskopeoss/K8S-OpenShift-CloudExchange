@@ -417,13 +417,37 @@ ui:
       cpu: 250m
   ## Security Context for ui
   ##
-  securityContext:
-    ## @param ui.securityContext.privileged Privileged containers can allow almost completely unrestricted host access
-    ##
-    privileged: false
-    ## @param ui.securityContext.allowPrivilegeEscalation Enable privilege escalation
-    ## it should be true if privileged is set to true.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-    ##
-    allowPrivilegeEscalation: false
+  ## @param podSecurityContext Security context
+  podSecurityContext: {}
+  ## @param initContainerSecurityContext Security context
+  initContainerSecurityContext:
+    # privileged: false
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+  ## @param containerSecurityContext Security context
+  containerSecurityContext:
+    # runAsNonRoot: true
+    # privileged: false
+    # allowPrivilegeEscalation: false
+    # capabilities:
+    #   drop:
+    #     - ALL
+  ## @deprecated The securityContext variable has been split three:
+  ## - containerSecurityContext
+  ## - initContainerSecurityContext
+  ## - podSecurityContext
+  # securityContext:
+  # securityContext:
+  #   ## @deprecated
+  #   ## @param ui.securityContext.privileged Privileged containers can allow almost completely unrestricted host access
+  #   ##
+  #   privileged: false
+  #   ## @deprecated
+  #   ## @param ui.securityContext.allowPrivilegeEscalation Enable privilege escalation
+  #   ## it should be true if privileged is set to true.
+  #   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  #   ##
+  #   allowPrivilegeEscalation: false
 
