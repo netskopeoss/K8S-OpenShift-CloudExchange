@@ -20,25 +20,14 @@ The following prerequisites are required to deploy the Netskope Cloud Exchange u
 ## Deploying the Netskope CE Helm Chart
 > **FYI:** A `Release` is an instance of a chart running in a Kubernetes cluster. One chart can often be installed many times into the same cluster. And each time it is installed, a new release is created. The release name should contain lower-letters, numbers, and hyphens only.
 
-Before installing the actual product helm chart, we have to deploy the Kubernetes operator for MongoDB and RabbitMQ.
-> **Note:** If we are deploying the helm chart on the `Openshift` at that time we will have to provide privileged access to some service accounts before the deploy helm chart. We have mentioned those service account names here `mongodb-database`, `mongodb-kubernetes-operator`, `netskope-ce-rabbitmqcluster-server`, `rabbitmq-operator-rabbitmq-cluster-operator`, `rabbitmq-operator-rabbitmq-messaging-topology-operator` and the service account that you are providing (if you are not providing the service account then provide the privileged access to this `netskope-ce-serviceaccount` that we are creating by default). Skip this step if you are not on the `Openshift`.
-To provide the privileged access to the above service accounts, run the below command.
-```
-oc adm policy add-scc-to-user privileged system:serviceaccount:<namespace-name>:<service-account-name>
-```
-
 To install MongoDB kubernetes operator: 
 ```
 helm repo add mongodb https://mongodb.github.io/helm-charts 
 helm install community-operator mongodb/community-operator -n <namespace-name>
 ```
 
-To install RabbitMQ kubernetes operator:
-```
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install rabbitmq-operator bitnami/rabbitmq-cluster-operator -n <namespace-name>
+To install RabbitMQ kubernetes operator, please follow this [guide](https://www.rabbitmq.com/kubernetes/operator/quickstart-operator.html).
 
-```
 To install the chart:
 ```bash
 $ helm install <release-name> . -n <namespace-name>
