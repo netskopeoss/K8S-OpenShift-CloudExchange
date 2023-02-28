@@ -2,9 +2,13 @@
 ##
 namespace: netskope
 mongodb:
-  securityContext:
-    privileged: true
-    allowPrivilegeEscalation: true
+  initContainers:
+    volumePermissionContainer:
+      create: false
+  podSecurityContext:
+    runAsUser: 1001380000
+    runAsNonRoot: true
+    fsGroup: 1001380000
   auth:
     rootPassword: <>
     cteAdminPassword: <>

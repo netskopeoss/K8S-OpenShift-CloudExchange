@@ -57,6 +57,8 @@ spec:
     spec:
       template:
         spec:
+          securityContext:
+            {{- toYaml .Values.mongodb.podSecurityContext | nindent 12 }} 
           initContainers:
             {{- if .Values.mongodb.initContainers.volumePermissionContainer.create }}
             - name: change-dir-permissions-data
@@ -72,14 +74,7 @@ spec:
               - mountPath: /data
                 name: data-volume
               securityContext:
-                privileged: {{ .Values.mongodb.securityContext.privileged }}
-                allowPrivilegeEscalation: {{ .Values.mongodb.securityContext.allowPrivilegeEscalation }}
-                runAsNonRoot: false
-                runAsUser: 0
-                runAsGroup: 0
-                capabilities:
-                  drop:
-                    - ALL
+                {{- toYaml .Values.mongodb.initContainerSecurityContext | nindent 16 }}
             - name: change-dir-permissions-logs
               command:
                 - sh
@@ -93,37 +88,16 @@ spec:
               - mountPath: /var/log/mongodb-mms-automation
                 name: logs-volume
               securityContext:
-                privileged: {{ .Values.mongodb.securityContext.privileged }}
-                allowPrivilegeEscalation: {{ .Values.mongodb.securityContext.allowPrivilegeEscalation }}
-                runAsNonRoot: false
-                runAsUser: 0
-                runAsGroup: 0
-                capabilities:
-                  drop:
-                    - ALL
+                  {{- toYaml .Values.mongodb.initContainerSecurityContext | nindent 16 }}
             {{- end }}
           containers:
             - name: mongod
               securityContext:
-                privileged: {{ .Values.mongodb.securityContext.privileged }}
-                allowPrivilegeEscalation: {{ .Values.mongodb.securityContext.allowPrivilegeEscalation }}
-                runAsNonRoot: true
-                runAsUser: 1001
-                runAsGroup: 1001
-                capabilities:
-                  drop:
-                    - ALL
+                {{- toYaml .Values.mongodb.containerSecurityContext | nindent 16 }}
               resources: {{- toYaml .Values.mongodb.resources | nindent 16 }}
             - name: mongodb-agent
               securityContext:
-                privileged: {{ .Values.mongodb.securityContext.privileged }}
-                allowPrivilegeEscalation: {{ .Values.mongodb.securityContext.allowPrivilegeEscalation }}
-                runAsNonRoot: true
-                runAsUser: 1001
-                runAsGroup: 1001
-                capabilities:
-                  drop:
-                    - ALL
+                {{- toYaml .Values.mongodb.containerSecurityContext | nindent 16 }}
       volumeClaimTemplates:
         - kind: PersistentVolumeClaim
           apiVersion: v1

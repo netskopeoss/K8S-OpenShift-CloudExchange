@@ -83,15 +83,44 @@ mongodb:
   replicaCount: 3
   ## Security Context for mongodb
   ##
-  securityContext:
-    ## @param mongodb.securityContext.privileged Privileged containers can allow almost completely unrestricted host access
-    ##
-    privileged: false
-    ## @param mongodb.securityContext.allowPrivilegeEscalation Enable privilege escalation
-    ## it should be true if privileged is set to true.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-    ##
-    allowPrivilegeEscalation: false
+  ## @param podSecurityContext Security context
+  podSecurityContext: {}
+  ## @param initContainerSecurityContext Security context
+  initContainerSecurityContext:
+    # privileged: false
+    # allowPrivilegeEscalation: false
+    # runAsNonRoot: false
+    # runAsUser: 0
+    # runAsGroup: 0
+    # capabilities:
+    #   drop:
+    #     - ALL
+  ## @param containerSecurityContext Security context
+  containerSecurityContext:
+    # privileged: false
+    # allowPrivilegeEscalation: false
+    # runAsNonRoot: true
+    # runAsUser: 1001
+    # runAsGroup: 1001
+    # capabilities:
+    #   drop:
+    #     - ALL
+
+  ## @deprecated The securityContext variable has been split three:
+  ## - containerSecurityContext
+  ## - initContainerSecurityContext
+  ## - podSecurityContext
+  # securityContext:
+  #   ## @deprecated please use securityContext
+  #   ## @param mongodb.securityContext.privileged Privileged containers can allow almost completely unrestricted host access
+  #   ##
+  #   privileged: false
+  #   ## @param mongodb.securityContext.allowPrivilegeEscalation Enable privilege escalation
+  #   ## it should be true if privileged is set to true.
+  #   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  #   ##
+  #   ## @deprecated please use securityContext
+  #   allowPrivilegeEscalation: false
   ## Persistence using Persistent Volume Claims
   ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
   ##
