@@ -37,5 +37,4 @@ core:
   auth:
     analyticsToken: <>
     jwtToken: <>
-ui:
-  image: <>
+
