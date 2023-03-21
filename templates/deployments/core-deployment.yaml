@@ -50,6 +50,8 @@ spec:
         {{- end }}
       {{- end }}
     spec:
+      securityContext:
+        {{- toYaml .Values.core.podSecurityContext | nindent 8 }}
       initContainers:
         {{- if .Values.core.initContainers.volumePermissionContainer.create }}
         - name: change-dir-permissions
@@ -65,11 +67,7 @@ spec:
             - mountPath: /opt/netskope/plugins/custom_plugins
               name: {{ printf "%s-core-custom-plugins-config-volume" .Chart.Name }}
           securityContext:
-            privileged: {{ .Values.core.securityContext.privileged }}
-            allowPrivilegeEscalation: {{ .Values.core.securityContext.allowPrivilegeEscalation }}
-            capabilities:
-              drop:
-                - ALL
+            {{- toYaml .Values.core.initContainerSecurityContext | nindent 12 }}
         {{- end }}
         - name: init-core
           image: busybox:latest
@@ -92,11 +90,7 @@ spec:
                 echo waiting for rabbitmq-stats;sleep 2; 
               done;
           securityContext:
-            privileged: {{ .Values.core.securityContext.privileged }}
-            allowPrivilegeEscalation: {{ .Values.core.securityContext.allowPrivilegeEscalation }}
-            capabilities:
-              drop:
-                - ALL
+            {{- toYaml .Values.core.initContainerSecurityContext | nindent 12 }}
       containers:
         - env:
             - name: UI_SERVICE_NAME
@@ -177,12 +171,7 @@ spec:
             timeoutSeconds: 20
           resources: {{- toYaml .Values.core.resources | nindent 12 }}
           securityContext:
-            runAsNonRoot: true
-            privileged: {{ .Values.core.securityContext.privileged }}
-            allowPrivilegeEscalation: {{ .Values.core.securityContext.allowPrivilegeEscalation }}
-            capabilities:
-              drop:
-                - ALL
+            {{- toYaml .Values.core.containerSecurityContext | nindent 12 }}
           volumeMounts:
             {{- if .Values.core.caCertificate }}
             - name: {{ printf "%s-ca-cert-volume" .Chart.Name }}

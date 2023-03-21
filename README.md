@@ -20,25 +20,14 @@ The following prerequisites are required to deploy the Netskope Cloud Exchange u
 ## Deploying the Netskope CE Helm Chart
 > **FYI:** A `Release` is an instance of a chart running in a Kubernetes cluster. One chart can often be installed many times into the same cluster. And each time it is installed, a new release is created. The release name should contain lower-letters, numbers, and hyphens only.
 
-Before installing the actual product helm chart, we have to deploy the Kubernetes operator for MongoDB and RabbitMQ.
-> **Note:** If we are deploying the helm chart on the `Openshift` at that time we will have to provide privileged access to some service accounts before the deploy helm chart. We have mentioned those service account names here `mongodb-database`, `mongodb-kubernetes-operator`, `netskope-ce-rabbitmqcluster-server`, `rabbitmq-operator-rabbitmq-cluster-operator`, `rabbitmq-operator-rabbitmq-messaging-topology-operator` and the service account that you are providing (if you are not providing the service account then provide the privileged access to this `netskope-ce-serviceaccount` that we are creating by default). Skip this step if you are not on the `Openshift`.
-To provide the privileged access to the above service accounts, run the below command.
-```
-oc adm policy add-scc-to-user privileged system:serviceaccount:<namespace-name>:<service-account-name>
-```
-
-To install MongoDB kubernetes operator: 
+To install MongoDB community operator: 
 ```
 helm repo add mongodb https://mongodb.github.io/helm-charts 
 helm install community-operator mongodb/community-operator -n <namespace-name>
 ```
 
-To install RabbitMQ kubernetes operator:
-```
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install rabbitmq-operator bitnami/rabbitmq-cluster-operator -n <namespace-name>
+To install RabbitMQ kubernetes operator, please follow this [guide](https://www.rabbitmq.com/kubernetes/operator/quickstart-operator.html).
 
-```
 To install the chart:
 ```bash
 $ helm install <release-name> . -n <namespace-name>
@@ -86,9 +75,10 @@ The command removes all the Kubernetes components associated with the chart and 
 | `mongodb.image`          | Docker image of MongoDB statefulset                                                                       | `index.docker.io/mongo:5.0.14` | No          |
 | `mongodb.initContainers.volumePermissionContainer.create` | Creates init containers will use for change the mount volume permission and ownership | `false`           | No          |
 | `mongodb.resources`      | Resources request and limit for MongoDB (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 2Gi <br/> cpu: 1000m <br/>requests: <br> memory: 512Mi <br> cpu: 500m </pre> | No          |
-| `mongodb.replicaCount`   | No. of replica of MongoDB                                                                                  | `3`             | No          |        
-| `mongodb.securityContext.privileged` | Privileged containers can allow almost completely unrestricted host access                    | `false`         | No          |
-| `mongodb.securityContext.allowPrivilegeEscalation` | Enable privilege escalation, it should be true if privileged is set to true.    | `false`         | No          |
+| `mongodb.replicaCount`   | No. of replica of MongoDB                                                                                 | `3`             | No          |        
+| `mongodb.podSecurityContext` | Configure PodSecurityContext for all containers in a Pod                                              | `{}`            | No          |
+| `mongodb.initContainerSecurityContext` | Configure Security Context for init containers                                              | `{}`            | No          |
+| `mongodb.containerSecurityContext` | Configure Security Context for all containers                                                   | `{}`            | No          |
 | `mongodb.persistence.size` | PVC Storage Request for MongoDB data volume                                                             | `3Gi`           | No          |
 | `mongodb.persistence.storageClassName` | PVC Storage Class for MongoDB data volume                                                   | `manual`        | No          |
 | `mongodb.persistence.annotations` | PVC annotations                                                                                  | `{}`            | No          |
@@ -105,9 +95,10 @@ The command removes all the Kubernetes components associated with the chart and 
 | `rabbitmq.annotations`    | Additional annotations to be added to the RabbitMQ statefulset                                           | `{}`            | No          |
 | `rabbitmq.image`         | Docker image of RabbitMQ statefulset                                                                      | `index.docker.io/rabbitmq:3.9-management` | No          |
 | `rabbitmq.replicaCount`         | No. of replica of RabbitMQ                                                                      | `3` | No          |  
-| `rabbitmq.resources`     | Resources request and limit for RabbitMQ (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 2Gi <br/> cpu: 1000m <br/>requests: <br> memory: 2Gi <br> cpu: 500m </pre> |  No          |       
-| `rabbitmq.securityContext.privileged` | Privileged containers can allow almost completely unrestricted host access                   | `false`         | No          |
-| `rabbitmq.securityContext.allowPrivilegeEscalation` | Enable privilege escalation, it should be true if privileged is set to true    | `false`         | No          |
+| `rabbitmq.resources`     | Resources request and limit for RabbitMQ (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 2Gi <br/> cpu: 1000m <br/>requests: <br> memory: 2Gi <br> cpu: 500m </pre> |  No          | 
+| `rabbitmq.podSecurityContext` | Configure PodSecurityContext for all containers in a Pod                                              | `{}`            | No          |
+| `rabbitmq.initContainerSecurityContext` | Configure Security Context for init containers                                              | `{}`            | No          |
+| `rabbitmq.containerSecurityContext` | Configure Security Context for all containers                                                   | `{}`            | No          |
 | `rabbitmq.persistence.size` | PVC Storage Request for RabbitMQ data volume                                                           | `3Gi`           | No          |
 | `rabbitmq.persistence.storageClassName` | PVC Storage Class for Rabbitmq data volume                                                 | `manual`        | No          |
 | `rabbitmq.persistence.annotations` | PVC annotations                                                                                 | `{}`            | No          |
@@ -128,8 +119,9 @@ The command removes all the Kubernetes components associated with the chart and 
 | `core.proxy.enable`  | To enable proxy in Core                                                                              | `false`         | No          |
 | `core.proxy.url`     | Proxy URL                                                                                            | `""`            | If `core.proxy.enable: true` |
 | `core.resources`         | Resources request and limit for Core (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                   |  <pre>limits: <br/> memory: 4Gi <br/> cpu: 4000m <br/>requests: <br> memory: 2Gi <br> cpu: 2000m </pre> | No            |            
-| `core.securityContext.privileged` | Privileged containers can allow almost completely unrestricted host access                       | `false`         | No          |
-| `core.securityContext.allowPrivilegeEscalation` | Enable privilege escalation, it should be true if privileged is set to true        | `false`         | No          |
+| `core.podSecurityContext` | Configure PodSecurityContext for all containers in a Pod                                              | `{}`            | No          |
+| `core.initContainerSecurityContext` | Configure Security Context for init containers                                              | `{}`            | No          |
+| `core.containerSecurityContext` | Configure Security Context for all containers                                                   | `{}`            | No          |
 | `core.persistence.size` | PVC Storage Request for Core data volume                                                           | `3Gi`           | No          |
 | `core.persistence.storageClassName` | PVC Storage Class for Core data volume                                                 | `manual`        | No          |
 | `core.persistence.annotations` | PVC annotations                                                                                 | `{}`            | No          |
@@ -150,8 +142,9 @@ The command removes all the Kubernetes components associated with the chart and 
 | `ui.replicaCount`        | No. of replica of UI                                                                                      | `1`             | No          |
 | `ui.ssl`                 | To enable SSL certificates                                                                                | `false`          | No          |
 | `ui.resources`           | Resources request and limit for UI (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 204Mi <br/> cpu: 750m <br/>requests: <br> memory: 102Mi <br> cpu: 250m </pre> | No           |
-| `ui.securityContext.privileged` | Privileged containers can allow almost completely unrestricted host access                         | `false`         | No          |
-| `ui.securityContext.allowPrivilegeEscalation` | Enable privilege escalation, it should be true if privileged is set to true.         | `false`         | No          |
+| `ui.podSecurityContext` | Configure PodSecurityContext for all containers in a Pod                                              | `{}`            | No          |
+| `ui.initContainerSecurityContext` | Configure Security Context for init containers                                              | `{}`            | No          |
+| `ui.containerSecurityContext` | Configure Security Context for all containers                                                   | `{}`            | No          |
 
 > Note: If you enable `ui.ssl` certificates (Default: false), your SSL certificates and certificate & certificate private key (with the respective names `cte_cert.key` and `cte_cert_key.key`) must be present in the certificates directory at the root.
 

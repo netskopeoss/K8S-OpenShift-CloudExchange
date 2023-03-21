@@ -2,14 +2,55 @@
 ##
 namespace: netskope
 mongodb:
+  initContainers:
+    volumePermissionContainer:
+      create: true
+  podSecurityContext: {}
+  initContainerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    runAsNonRoot: false
+    runAsUser: 0
+    runAsGroup: 0
+    capabilities:
+      drop:
+        - ALL
+  containerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    capabilities:
+      drop:
+        - ALL
   auth:
     rootPassword: <>
     cteAdminPassword: <>
 rabbitmq:
+  initContainerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    runAsUser: 1001
+    runAsGroup: 1001
+    capabilities:
+      drop:
+        - ALL
+  containerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    runAsUser: 1001
+    runAsGroup: 1001
+    capabilities:
+      drop:
+        - ALL
   auth:
     rabbitmqDefaultPassword: <>
 core:
   image: <>
+  initContainers:
+    volumePermissionContainer:
+      create: true
   ## The below given resources are depends on the Package Type.
   resources:
     limits:
@@ -18,8 +59,34 @@ core:
     requests:
       memory: 2Gi
       cpu: 2000m
+  initContainerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  containerSecurityContext:
+    runAsNonRoot: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
   auth:
     analyticsToken: <>
     jwtToken: <>
 ui:
   image: <>
+  initContainerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  containerSecurityContext:
+    runAsNonRoot: true
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL

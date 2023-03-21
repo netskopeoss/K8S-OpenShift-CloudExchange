@@ -27,26 +27,16 @@ spec:
       spec:
         template:
           spec:
+            securityContext:
+              {{- toYaml .Values.rabbitmq.podSecurityContext | nindent 14 }} 
             initContainers:
               - name: setup-container
                 securityContext:
-                  privileged: {{ .Values.rabbitmq.securityContext.privileged }}
-                  allowPrivilegeEscalation: {{ .Values.rabbitmq.securityContext.allowPrivilegeEscalation }}
-                  runAsUser: 1001
-                  runAsGroup: 1001
-                  capabilities:
-                    drop:
-                      - ALL
+                  {{- toYaml .Values.rabbitmq.initContainerSecurityContext | nindent 18 }}
             containers:
               - name: rabbitmq
                 securityContext:
-                  privileged: {{ .Values.rabbitmq.securityContext.privileged }}
-                  allowPrivilegeEscalation: {{ .Values.rabbitmq.securityContext.allowPrivilegeEscalation }}
-                  runAsUser: 1001
-                  runAsGroup: 1001
-                  capabilities:
-                    drop:
-                      - ALL
+                  {{- toYaml .Values.rabbitmq.containerSecurityContext | nindent 18 }}
                 env: 
                   - name: RABBITMQ_DEFAULT_USER
                     value: {{ .Values.rabbitmq.auth.rabbitmqDefaultUser }}
