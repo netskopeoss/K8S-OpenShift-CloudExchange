@@ -20,7 +20,7 @@ The following prerequisites are required to deploy the Netskope Cloud Exchange u
 ## Deploying the Netskope CE Helm Chart
 > **FYI:** A `Release` is an instance of a chart running in a Kubernetes cluster. One chart can often be installed many times into the same cluster. And each time it is installed, a new release is created. The release name should contain lower-letters, numbers, and hyphens only.
 
-To install MongoDB kubernetes operator: 
+To install MongoDB community operator: 
 ```
 helm repo add mongodb https://mongodb.github.io/helm-charts 
 helm install community-operator mongodb/community-operator -n <namespace-name>
