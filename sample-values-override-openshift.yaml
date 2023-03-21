@@ -2,9 +2,6 @@
 ##
 namespace: netskope
 mongodb:
-  initContainers:
-    volumePermissionContainer:
-      create: false
   podSecurityContext:
     runAsUser: 1001380000
     runAsNonRoot: true
@@ -31,9 +28,6 @@ core:
     runAsUser: 1001380000
     runAsNonRoot: true
     fsGroup: 1001380000
-  initContainers:
-    volumePermissionContainer:
-      create: false
   auth:
     analyticsToken: <>
     jwtToken: <>

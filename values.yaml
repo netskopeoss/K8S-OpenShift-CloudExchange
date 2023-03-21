@@ -67,7 +67,7 @@ mongodb:
     volumePermissionContainer:
       ## @param mongodb.initContainer.volumePermissionContainer.create creates init containers will use for change the mount volume permission and ownership
       ##
-      create: true
+      create: false
   ## @param mongodb.resources resources request and limit for mongodb
   ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
   ##
@@ -86,7 +86,7 @@ mongodb:
   ## @param podSecurityContext Security context
   podSecurityContext: {}
   ## @param initContainerSecurityContext Security context
-  initContainerSecurityContext:
+  initContainerSecurityContext: {}
     # privileged: false
     # allowPrivilegeEscalation: false
     # runAsNonRoot: false
@@ -96,7 +96,7 @@ mongodb:
     #   drop:
     #     - ALL
   ## @param containerSecurityContext Security context
-  containerSecurityContext:
+  containerSecurityContext: {}
     # privileged: false
     # allowPrivilegeEscalation: false
     # runAsNonRoot: true
@@ -179,7 +179,7 @@ rabbitmq:
   ## @param podSecurityContext Security context
   podSecurityContext: {}
   ## @param initContainerSecurityContext Security context
-  initContainerSecurityContext:
+  initContainerSecurityContext: {}
     # privileged: false
     # allowPrivilegeEscalation: false
     # runAsUser: 1001
@@ -188,7 +188,7 @@ rabbitmq:
     #   drop:
     #     - ALL
   ## @param containerSecurityContext Security context
-  containerSecurityContext:
+  containerSecurityContext: {}
     # privileged: false
     # allowPrivilegeEscalation: false
     # runAsUser: 1001
@@ -308,16 +308,16 @@ core:
   ## Security Context for core
   ##
   ## @param podSecurityContext Security context
-  podSecurityContext:
+  podSecurityContext: {}
   ## @param initContainerSecurityContext Security context
-  initContainerSecurityContext:
+  initContainerSecurityContext: {}
     # privileged: false
     # allowPrivilegeEscalation: false
     # capabilities:
     #   drop:
     #     - ALL
   ## @param containerSecurityContext Security context
-  containerSecurityContext:
+  containerSecurityContext: {}
     # runAsNonRoot: true
     # privileged: false
     # allowPrivilegeEscalation: false
@@ -420,14 +420,14 @@ ui:
   ## @param podSecurityContext Security context
   podSecurityContext: {}
   ## @param initContainerSecurityContext Security context
-  initContainerSecurityContext:
+  initContainerSecurityContext: {}
     # privileged: false
     # allowPrivilegeEscalation: false
     # capabilities:
     #   drop:
     #     - ALL
   ## @param containerSecurityContext Security context
-  containerSecurityContext:
+  containerSecurityContext: {}
     # runAsNonRoot: true
     # privileged: false
     # allowPrivilegeEscalation: false

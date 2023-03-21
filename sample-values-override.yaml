@@ -2,6 +2,9 @@
 ##
 namespace: netskope
 mongodb:
+  initContainers:
+    volumePermissionContainer:
+      create: true
   podSecurityContext: {}
   initContainerSecurityContext:
     privileged: false
@@ -45,6 +48,9 @@ rabbitmq:
     rabbitmqDefaultPassword: <>
 core:
   image: <>
+  initContainers:
+    volumePermissionContainer:
+      create: true
   ## The below given resources are depends on the Package Type.
   resources:
     limits:
