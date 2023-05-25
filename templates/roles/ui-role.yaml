@@ -1,0 +1,27 @@
+{{- if .Values.ui.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ printf "%s-ui-role" .Chart.Name }}
+  labels:
+    app.kubernetes.io/name: {{ printf "%s-ui-role" .Chart.Name }}
+    {{- include "resource.labels.commonLabels" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  namespace: {{ include "namespace.name" . }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+    resourceNames:
+      - {{ printf "%s-ui-service" .Chart.Name }}
+{{- if .Values.ui.rbac.rules }}
+{{- include "common.tplvalues.render" ( dict "value" .Values.ui.rbac.rules "context" $ ) | nindent 2 }}
+{{- end -}}
+{{- end }}

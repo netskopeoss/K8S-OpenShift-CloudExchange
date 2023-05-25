@@ -1,0 +1,39 @@
+## This sample values-override file shows how to override few parameters based on the Use Case with Horizontal Scaling (HS).
+## Please provide the necessary values against each attribute by replacing "<>" depending upon the use case (CE deployment package, etc). For more details, please refer README.
+## 
+namespace: <>
+mongodb:
+  securityContext:
+    privileged: true
+    allowPrivilegeEscalation: true
+  auth:
+    rootPassword: <>
+    cteAdminPassword: <>
+rabbitmq:
+  securityContext:
+    privileged: true
+    allowPrivilegeEscalation: true
+  auth:
+    rabbitmqDefaultPassword: <>
+core:
+  image: <>
+  securityContext:
+    privileged: true
+    allowPrivilegeEscalation: true
+  workerConcurrency: <>
+  resources:
+    core:
+      limits:
+        memory: <>
+        cpu: <>
+      requests:
+        memory: <>
+        cpu: <>
+  replicaCount:
+    worker: <>
+  rabbitmqAvailableStorage: "<>"
+  auth:
+    analyticsToken: <>
+    jwtToken: <>
+ui:
+  image: <>

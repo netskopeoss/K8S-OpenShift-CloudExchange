@@ -1,0 +1,203 @@
+{{- if ne (int .Values.core.replicaCount.worker) (int 0) }}
+{{- $replicaCount := int .Values.rabbitmq.replicaCount }}
+{{- $podName := (printf "%s-rabbitmqcluster-server" .Chart.Name) }}
+{{- $serviceName := (printf "%s-rabbitmqcluster-nodes" .Chart.Name) }}
+{{- $namespaceName := (include "namespace.name" .) }}
+{{- $rabbitMQDefaultUser := .Values.rabbitmq.auth.rabbitmqDefaultUser }}
+{{- $rabbitMQList := list }}
+{{- range $e, $i := until $replicaCount }}
+{{- $rabbitMQList = append $rabbitMQList (printf "amqp://%s:$(RABBITMQ_PASSWORD)@%s-%d.%s.%s.svc.cluster.local:5672" $rabbitMQDefaultUser $podName $i $serviceName $namespaceName) }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-worker" .Chart.Name }}
+  labels:
+    app.kubernetes.io/name: {{ printf "%s-worker" .Chart.Name }}
+    container: worker
+    {{- if .Values.core.labels }}
+    {{- toYaml .Values.core.labels | nindent 4 }}
+    {{- end }}
+    {{- include "resource.labels.commonLabels" .  | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  namespace: {{ include "namespace.name" . }}
+  {{- if or .Values.core.annotations .Values.commonAnnotations }}
+  annotations: 
+    {{- if .Values.core.annotations }}
+    {{- toYaml .Values.core.annotations | nindent 4 }}
+    {{- end }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.core.replicaCount.worker }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ printf "%s-worker" .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ printf "%s-worker" .Chart.Name }}
+        container: worker
+        {{- if .Values.core.labels }}
+        {{- toYaml .Values.core.labels | nindent 8 }}
+        {{- end }}
+        {{- include "resource.labels.commonLabels" . | nindent 8 }}
+        {{- if .Values.commonLabels }}
+        {{- include "tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 8 }}
+        {{- end }}
+      namespace: {{ include "namespace.name" . }}
+      {{- if or .Values.core.annotations .Values.commonAnnotations }}
+      annotations: 
+        {{- if .Values.core.annotations }}
+        {{- toYaml .Values.core.annotations | nindent 8 }}
+        {{- end }}
+        {{- if .Values.commonAnnotations }}
+        {{- include "tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    spec:
+      initContainers:
+        - name: init-worker
+          env:
+            - name: CORE_SERVICE
+              value: {{ printf "%s-core-service" .Chart.Name }}
+          image: {{ .Values.core.initContainers.image }}
+          imagePullPolicy: Always
+          command:
+            - sh
+            - "-c"
+            - >-
+              until nc -z $(CORE_SERVICE) 80 > /dev/null;
+              do 
+                echo waiting for core;sleep 2; 
+              done;
+          securityContext:
+            privileged: {{ .Values.core.securityContext.privileged }}
+            allowPrivilegeEscalation: {{ .Values.core.securityContext.allowPrivilegeEscalation }}
+            capabilities:
+              drop:
+                - ALL
+      containers:
+        - env:
+            - name: UI_SERVICE_NAME
+              value: {{ printf "%s-ui-service" .Chart.Name }}
+            - name: ANALYTICS_BASE_URL
+              value: https://reporting.netskope.tech
+            - name: ANALYTICS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: analytics-token
+                  name: {{ .Values.core.secrets.core.name }}
+            - name: UI_LATEST_VERSION_TAG
+              value: {{ printf "%s:ui4-latest" (split ":" .Values.ui.image)._0 }}
+            - name: CORE_LATEST_VERSION_TAG
+              value: {{ printf "%s:core4-latest" (split ":" .Values.core.image)._0 }}
+            - name: RABBITMQ_AVAILABLE_STORAGE
+              value: "{{ .Values.core.rabbitmqAvailableStorage }}"
+            - name: MANAGED_CE
+            {{- if eq (int .Values.core.replicaCount.worker) (int 0) }}
+              value: "false"
+            {{- else }}
+              value: "true"
+            {{- end }}
+            - name: WORKER_CONCURRENCY
+              value: "{{ .Values.core.workerConcurrency }}" 
+            - name: ENABLE_CELERY_BEAT
+              value: "false"
+            {{- if .Values.core.proxy.enable }}
+            - name: HTTP_PROXY
+              value: {{ required "Proxy URL cannot be empty" .Values.core.proxy.url }}
+            - name: HTTPS_PROXY
+              value: {{ required "Proxy URL cannot be empty" .Values.core.proxy.url }}
+            {{- end }} 
+            - name: JWT_ALGORITHM
+              value: HS256
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: jwt-secret
+                  name: {{ .Values.core.secrets.core.name }}
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: rabbitmq-default-password
+                  name: {{ .Values.rabbitmq.secrets.name }}
+            - name: MAX_MAINTENANCE_WINDOW_MINUTES
+              value: "15"
+            - name: MAX_WAIT_ON_LOCK_IN_MINUTES
+              value: "240"
+            - name: MONGO_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  key: connectionString.standard
+                  name: {{ printf "%s-mongo-cteadmin-connection-string" .Chart.Name }}
+                  optional: false
+            - name: PULL_THREADS
+              value: "6"
+            - name: RABBITMQ_CONNECTION_STRING
+              value: {{ join ";" $rabbitMQList }}
+            - name: POPEN_TIMEOUT
+              value: "1800"
+            - name: REQUESTS_TIMEOUT
+              value: "300"
+          image: {{ .Values.core.image }}
+          imagePullPolicy: Always
+          name: {{ printf "%s-worker" .Chart.Name }}
+          resources: {{- toYaml .Values.core.resources.worker | nindent 12 }}
+          securityContext:
+            runAsNonRoot: true
+            privileged: {{ .Values.core.securityContext.privileged }}
+            allowPrivilegeEscalation: {{ .Values.core.securityContext.allowPrivilegeEscalation }}
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            {{- if .Values.core.caCertificate }}
+            - name: {{ printf "%s-ca-cert-volume" .Chart.Name }}
+              mountPath: /usr/local/share/ca-certificates
+              readOnly: true
+            {{- end }}
+            - mountPath: /opt/netskope/plugins/
+              name: {{ printf "%s-worker-custom-plugins-config-volume" .Chart.Name }}
+            - mountPath: /opt/netskope/repos/
+              name: {{ printf "%s-worker-custom-repo-config-volume" .Chart.Name }}
+            - mountPath: /service-account
+              name: serviceaccount-token-volume
+              readOnly: true
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: container
+                      operator: In
+                      values:
+                        - worker
+                topologyKey: topology.kubernetes.io/zone
+      restartPolicy: Always
+      serviceAccount: {{ include "serviceAccountName.name" . }}
+      volumes:
+        - name: {{ printf "%s-worker-custom-plugins-config-volume" .Chart.Name }}
+          persistentVolumeClaim:
+            claimName: {{ printf "%s-core-custom-plugins-config-volume-pvc" .Chart.Name }}
+        - name: {{ printf "%s-worker-custom-repo-config-volume" .Chart.Name }}
+          persistentVolumeClaim:
+            claimName: {{ printf "%s-core-custom-repo-config-volume-pvc" .Chart.Name }}
+        {{- if .Values.core.caCertificate }}
+        - name: {{ printf "%s-ca-cert-volume" .Chart.Name }}
+          secret:
+            secretName: {{ .Values.core.secrets.caCertificate.name }}
+        {{- end }}
+        - name: serviceaccount-token-volume
+          projected:
+            sources:
+              - serviceAccountToken:
+                  expirationSeconds: 3600
+                  path: serviceaccount-token-volume
+{{- end }}

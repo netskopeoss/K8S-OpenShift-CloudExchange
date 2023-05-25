@@ -1,0 +1,146 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-ui" .Chart.Name }}
+  labels:
+    app.kubernetes.io/name: {{ printf "%s-ui" .Chart.Name }}
+    container: ui
+    {{- if .Values.ui.labels }}
+    {{- toYaml .Values.ui.labels | nindent 4 }}
+    {{- end }}
+    {{- include "resource.labels.commonLabels" .  | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  namespace: {{ include "namespace.name" . }}
+  {{- if or .Values.ui.annotations .Values.commonAnnotations }}
+  annotations: 
+    {{- if .Values.ui.annotations }}
+    {{- toYaml .Values.ui.annotations | nindent 4 }}
+    {{- end }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.ui.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ printf "%s-ui" .Chart.Name }}
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ printf "%s-ui" .Chart.Name }}
+        container: ui
+        {{- if .Values.ui.labels }}
+        {{- toYaml .Values.ui.labels | nindent 8 }}
+        {{- end }}
+        {{- include "resource.labels.commonLabels" .  | nindent 8 }}
+        {{- if .Values.commonLabels }}
+        {{- include "tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 8 }}
+        {{- end }}
+      namespace: {{ include "namespace.name" . }}
+      {{- if or .Values.ui.annotations .Values.commonAnnotations }}
+      annotations: 
+        {{- if .Values.ui.annotations }}
+        {{- toYaml .Values.ui.annotations | nindent 8 }}
+        {{- end }}
+        {{- if .Values.commonAnnotations }}
+        {{- include "tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    spec:
+      initContainers:
+        - name: init-ui
+          image: {{ .Values.ui.initContainers.image }}
+          imagePullPolicy: Always
+          env:
+            - name: CORE_SERVICE
+              value: {{ printf "%s-core-service" .Chart.Name }}
+          command:
+            - sh
+            - "-c"
+            - >-
+              until nc -z $(CORE_SERVICE) 80 > /dev/null;
+              do 
+                echo waiting for core;sleep 2; 
+              done;
+          securityContext:
+            privileged: {{ .Values.ui.securityContext.privileged }}
+            allowPrivilegeEscalation: {{ .Values.ui.securityContext.allowPrivilegeEscalation }}
+            capabilities:
+              drop:
+                - ALL
+      containers:
+        - env:
+            - name: CORE_SERVICE_NAME
+              value: {{ printf "%s-core-service" .Chart.Name }}
+            - name: CE_API_URL
+              value: http://$(CORE_SERVICE_NAME)
+            - name: CE_API_PORT
+              value: '8000'
+            - name: TLS_VERSION
+              value: TLSv1.2
+          image: {{ .Values.ui.image }}
+          imagePullPolicy: Always
+          name: {{ printf "%s-ui" .Chart.Name }}
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 10
+          resources: {{- toYaml .Values.ui.resources | nindent 12 }}
+          securityContext:
+            runAsNonRoot: true
+            privileged: {{ .Values.ui.securityContext.privileged }}
+            allowPrivilegeEscalation: {{ .Values.ui.securityContext.allowPrivilegeEscalation }}
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            {{- if .Values.ui.ssl }}
+            - name: {{ printf "%s-ui-ssl-cert-config-volume" .Chart.Name }}
+              readOnly: true
+              mountPath: "/tmp/ssl_certs"
+            {{- end }}
+            - mountPath: /service-account
+              name: serviceaccount-token-volume
+              readOnly: true
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: container
+                      operator: In
+                      values:
+                        - ui
+                topologyKey: topology.kubernetes.io/zone
+      restartPolicy: Always
+      serviceAccount: {{ include "serviceAccountName.name" . }}
+      volumes:
+        {{- if .Values.ui.ssl }}
+        - name: {{ printf "%s-ui-ssl-cert-config-volume" .Chart.Name }}
+          secret:
+            secretName: {{ .Values.ui.secrets.name }}
+        {{- end }}
+        - name: serviceaccount-token-volume
+          projected:
+            sources:
+              - serviceAccountToken:
+                  expirationSeconds: 3600
+                  path: serviceaccount-token-volume

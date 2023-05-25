@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ printf "%s-core-custom-repo-config-volume-pvc" .Chart.Name }}
+  labels:
+    app.kubernetes.io/name: {{ printf "%s-core-custom-repo-config-volume-pvc" .Chart.Name }}
+    {{- include "resource.labels.commonLabels" .  | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.core.persistence.annotations .Values.commonAnnotations }}
+  annotations: 
+    {{- if .Values.core.persistence.annotations }}
+    {{- toYaml .Values.core.persistence.annotations | nindent 4 }}
+    {{- end }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+  namespace: {{ include "namespace.name" . }}
+spec:
+  accessModes:
+    {{- if ne (int .Values.core.replicaCount.worker) (int 0) }}
+    - ReadWriteMany
+    {{- else }}
+    - ReadWriteOnce
+    {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.core.persistence.size | quote }}
+  storageClassName: {{ .Values.core.persistence.storageClassName }}
+  volumeMode: Filesystem

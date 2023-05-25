@@ -1,0 +1,30 @@
+## This sample values-override file shows how to override few parameters based on the Use Case with Vertical Scaling (VS).
+## Please provide the necessary values against each attribute by replacing "<>" depending upon the use case (CE deployment package, etc). For more details, please refer README.
+## 
+namespace: <>
+mongodb:
+  auth:
+    rootPassword: <>
+    cteAdminPassword: <>
+rabbitmq:
+  auth:
+    rabbitmqDefaultPassword: <>
+core:
+  image: <>
+  workerConcurrency: <> # (Core Limit * 1.5)
+  resources:
+    core:
+      limits:
+        memory: <>
+        cpu: <>
+      requests:
+        memory: <>
+        cpu: <>
+  replicaCount:
+    worker: 0
+  rabbitmqAvailableStorage: "<>"
+  auth:
+    analyticsToken: <>
+    jwtToken: <>
+ui:
+  image: <>
