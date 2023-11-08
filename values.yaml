@@ -75,7 +75,7 @@ mongodb:
       name: netskope-ce-mongodb-cte-secret
   ## @param mongodb.image docker image of mongodb statefulset
   ##
-  image: index.docker.io/mongo:5.0.16
+  image: index.docker.io/mongo:5.0.21
   ## Init Container
   ##
   initContainers:
@@ -180,7 +180,7 @@ rabbitmq:
       create: true
   ## @param rabbitmq.image docker image of rabbitmq statefulset
   ##
-  image: index.docker.io/rabbitmq:3.11.11-management
+  image: index.docker.io/rabbitmq:3.12.6-management
   ## @param rabbitmq.replicaCount no of replica of rabbitmq
   ##
   replicaCount: 3
@@ -295,7 +295,7 @@ core:
     rules: []
   ## @param core.image docker image of core deployment
   ##
-  image: netskopetechnicalalliances/cloudexchange:core4-latest
+  image: netskopetechnicalalliances/cloudexchange:core5-latest
   ## @Replica Count for Worker
   ##
   replicaCount:
@@ -420,7 +420,7 @@ ui:
     rules: []
   ## @param ui.image docker image of UI deployment
   ##
-  image: netskopetechnicalalliances/cloudexchange:ui4-latest
+  image: netskopetechnicalalliances/cloudexchange:ui5-latest
   ## @param ui.replicaCount no of replica of ui
   ##
   replicaCount: 2

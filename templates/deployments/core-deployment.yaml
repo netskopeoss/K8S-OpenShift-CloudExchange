@@ -199,6 +199,29 @@ spec:
             - containerPort: 8000
               name: "core"
               protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: 8000
+            failureThreshold: 20
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 30
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 20
           resources: {{- toYaml .Values.core.resources.core | nindent 12 }}
           securityContext:
             runAsNonRoot: true

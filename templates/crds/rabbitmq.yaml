@@ -4,18 +4,18 @@ metadata:
   name: {{ printf "%s-rabbitmqcluster" .Chart.Name }}
   labels:
     app.kubernetes.io/name: {{ printf "%s-rabbitmqcluster" .Chart.Name }}
-    {{- if .Values.mongodb.labels }}
-    {{- toYaml .Values.mongodb.labels | nindent 4 }}
+    {{- if .Values.rabbitmq.labels }}
+    {{- toYaml .Values.rabbitmq.labels | nindent 4 }}
     {{- end }}
     {{- include "resource.labels.commonLabels" .  | nindent 4 }}
     {{- if .Values.commonLabels }}
     {{- include "tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
     {{- end }}
   namespace: {{ include "namespace.name" . }}
-  {{- if or .Values.mongodb.annotations .Values.commonAnnotations }}
+  {{- if or .Values.rabbitmq.annotations .Values.commonAnnotations }}
   annotations: 
-    {{- if .Values.mongodb.annotations }}
-    {{- toYaml .Values.mongodb.annotations | nindent 4 }}
+    {{- if .Values.rabbitmq.annotations }}
+    {{- toYaml .Values.rabbitmq.annotations | nindent 4 }}
     {{- end }}
     {{- if .Values.commonAnnotations }}
     {{- include "tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
@@ -77,7 +77,7 @@ spec:
                     valueFrom:
                       secretKeyRef:
                         key: rabbitmq-default-password
-                        name: {{ printf "%s-rabbitmq-secret" .Chart.Name }}
+                        name: {{ .Values.rabbitmq.secrets.name }}
                   - name: RABBITMQ_DISK_FREE_LIMIT_ABSOLUTE
                     value: "1"
   image: {{ .Values.rabbitmq.image }}

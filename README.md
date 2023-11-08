@@ -27,7 +27,7 @@ To learn more about Netskope Cloud Exchange please refer to the [Netskope Cloud 
 - [Package Sizing Matrix (Vertically-scaled Approach)](#package-sizing-matrix-vertically-scaled-approach)
 - [Comparison of Vertical-scaling v/s Horizontal-scaling Compute Requirements)](#comparison-of-vs-hs)
 - [Testing Matrix](#testing-matrix)
-- [Migrating CE v4.1.0 to CE v4.2.0](migrating-ce-v4.1.0-to-c3-v4.2.0)
+- [Migrating CE v4.2.0 to CE v5.0.0](migrating-ce-v4.2.0-to-c3-v5.0.0)
 - [Restoring MongoDB Data](#restoring-mongodb-data)
 - [Troubleshooting](#troubleshooting)
   - [RabbitMQ Split Brain (Network Partitions)](#rabbitmq-split-brain-network-partitions)
@@ -38,7 +38,7 @@ The following prerequisites are required to deploy the Netskope Cloud Exchange u
 - `kubectl` must be installed on your machine.
 - `helm` must be installed on your machine.
 - Namespace should be created before we deploy the helm chart.
-- Persistent Volume (PV) provisioner support in the underlying infrastructure (Note: At least two PVs must be present with ReadWriteMany access mode and we only support shared volumes because in order to support horizontal scaling in CE v4.2.0, the core and worker pods require shared volumes).
+- Persistent Volume (PV) provisioner support in the underlying infrastructure (Note: At least two PVs must be present with ReadWriteMany access mode and we only support shared volumes because in order to support horizontal scaling in CE v5.0.0, the core and worker pods require shared volumes).
 - Please refer to the section [Package Sizing Matrix](#package-sizing-matrix) before proceeding deployment. 
 
 <br/>
@@ -115,7 +115,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | ------------------------ | --------------------------------------------------------------------------------------------------------- | --------------- | ----------- |
 | `mongodb.labels`         | Additional labels to be added to the MongoDB statefulset                                             | `{}`            | No          |
 | `mongodb.annotations`    | Additional annotations to be added to the MongoDB statefulset                                             | `{}`            | No          |
-| `mongodb.image`          | Docker image of MongoDB statefulset                                                                       | `index.docker.io/mongo:5.0.16` | No          |
+| `mongodb.image`          | Docker image of MongoDB statefulset                                                                       | `index.docker.io/mongo:5.0.21` | No          |
 | `mongodb.initContainers.volumePermissionContainer.create` | Creates init containers will use for change the mount volume permission and ownership | `false`           | No          |
 | `mongodb.initContainers.image` | Init containers image | `busybox:latest`           | No          |
 | `mongodb.resources`      | Resources request and limit for MongoDB (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 1Gi <br/> cpu: 2000m <br/>requests: <br> memory: 500Mi <br> cpu: 1000m </pre> | No          |
@@ -143,7 +143,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `rabbitmq.annotations`    | Additional annotations to be added to the RabbitMQ statefulset                                           | `{}`            | No          |
 | `rabbitmq.initContainers.image`| docker image of init containers                                                 | `"busybox:latest"`            | No          |
 | `rabbimq.initContainers.volumePermissionContainer.create`       | Creates init containers will use for change the mount volume permission and ownership                                                 | `false`            | No          |
-| `rabbitmq.image`         | Docker image of RabbitMQ statefulset                                                                      | `index.docker.io/rabbitmq:3.11.11-management` | No          |
+| `rabbitmq.image`         | Docker image of RabbitMQ statefulset                                                                      | `index.docker.io/rabbitmq:3.12.6-management` | No          |
 | `rabbitmq.replicaCount`         | No. of replica of RabbitMQ                                                                      | `3` | No          |  
 | `rabbitmq.resources`     | Resources request and limit for RabbitMQ (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 3Gi <br/> cpu: 1000m <br/>requests: <br> memory: 1500Mi <br> cpu: 500m </pre> |  No          |       
 | `rabbitmq.securityContext.privileged` | Privileged containers can allow almost completely unrestricted host access                   | `false`         | No          |
@@ -164,7 +164,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `core.initContainers.volumePermissionContainer.create`       | Creates init containers will use for change the mount volume permission and ownership                                                 | `false`            | No          |
 | `core.rbac.create`       | Whether to create & use RBAC resources or not, binding ServiceAccount to a role                           | `true`          | No          |
 | `core.rbac.rules`        | Custom rules to create following the role specification                                                   | `[]`            | No          |
-| `core.image`             | Docker image of Core                                                                                      | `netskopetechnicalalliances/cloudexchange:core4-latest` | No          |
+| `core.image`             | Docker image of Core                                                                                      | `netskopetechnicalalliances/cloudexchange:core5-latest` | No          |
 | `core.replicaCount.core` | No. of replica count for Core                                                                          | `1`             | No          |
 | `core.replicaCount.worker` | No. of replica count for Worker                                                                      | `2`             | No          |
 | `core.proxy.enable`  | To enable proxy in Core                                                                              | `false`         | No          |
@@ -196,7 +196,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `ui.annotations`         | Additional annotations to be added to the UI deployment                                                 | `{}`            | No          |
 | `ui.rbac.create`         | Whether to create & use RBAC resources or not, binding ServiceAccount to a role                           | `true`          | No          |
 | `ui.rbac.rules`          | Custom rules to create following the role specification                                                   | `[]`            | No          |
-| `ui.image`               | Docker image of UI                                                                                        | `netskopetechnicalalliances/cloudexchange:ui4-latest` | No
+| `ui.image`               | Docker image of UI                                                                                        | `netskopetechnicalalliances/cloudexchange:ui5-latest` | No
 | `ui.replicaCount`        | No. of replica of UI                                                                                      | `2`             | No          |
 | `ui.ssl`                 | To enable SSL certificates                                                                                | `false`          | No          |
 | `ui.resources`           | Resources request and limit for UI (**Note:** These are default configurations for a low data volume (Extra Small Netskope CE Package Type). The end user may want to change these values as per the underlying use case and data volume on their end (based on the associated Netskope CE Package Type). While doing that, please ensure that the underlying cluster nodes should also have a cumulative sufficient compute power for this change to work seamlessly. For more details on the Netskope CE Package Types, please refer to the [Package Sizing Matrix](#package-sizing-matrix) section)                                                                    |  <pre>limits: <br/> memory: 250Mi <br/> cpu: 750m <br/>requests: <br> memory: 125Mi <br> cpu: 325m </pre> | No           |
@@ -279,7 +279,7 @@ Install AWS EFS CSI Driver in the Kubernetes cluster (in this case Amazon EKS cl
 
 https://github.com/kubernetes-sigs/aws-efs-csi-driver
 
-> **Note:** Based on the current latest version of AWS EFS CSI Driver (v1.4.3), the Kubernetes version should be `>=v1.17`. Though at any point in time, the compatibility versions of Kubernetes and AWS EFS CSI Driver can be identified from the above link.
+> **Note:** Based on the current latest version of AWS EFS CSI Driver (v1.7.0), the Kubernetes version should be `>=v1.17`. Though at any point in time, the compatibility versions of Kubernetes and AWS EFS CSI Driver can be identified from the above link.
 
 ### Step 3
 Create `StorageClass` in the Kubernetes deployment YAML file as mentioned below. In that StorageClass `directoryPerms` should be `700` and `gid` and `uid` should be `1001`.
@@ -393,62 +393,40 @@ This section depicts the container orchestration platforms and CE version on whi
 
 | Container Name | Image Tag                                           | Version | 
 | ---------------| --------------------------------------------------- | ------- |
-| Core           | [netskopetechnicalalliances/cloudexchange:core4-latest](https://hub.docker.com/layers/netskopetechnicalalliances/cloudexchange/core4-latest/images/sha256-61042a1b547c6d051374c9c0df45302a5ac9761b62cafbe917b632057719e061?context=explore) | 4.2.0       | 
-| UI           | [netskopetechnicalalliances/cloudexchange:ui4-latest](https://hub.docker.com/layers/netskopetechnicalalliances/cloudexchange/ui4-latest/images/sha256-77bf7e3cf5307bf8b868c26f7d6a3d82b2ba96d0e3e2c0b867871ffdc3b51467?context=explore) | 4.2.0        | 
-| MongoDB        | [index.docker.io/mongo:5.0.16](https://hub.docker.com/layers/library/mongo/5.0.16/images/sha256-db6fabcdc5e0f2ef20584acb238169f051158bcc35b33a4cc217441396724435?context=explore) | 5.0.16        | 
-| RabbitMQ        | [index.docker.io/rabbitmq:3.11.11-management](https://hub.docker.com/layers/library/rabbitmq/3.11.11-management/images/sha256-11bb72ba60467447335e157b1f785d67d295de5dc74590942622817fca524254?context=explore) | 3.11.11-management | 
+| Core           | [netskopetechnicalalliances/cloudexchange:core5-latest](https://hub.docker.com/layers/netskopetechnicalalliances/cloudexchange/core5-latest/images/sha256-f27d626adb718e6fd84234a44febedd15239ef14b20da90cfbb8cf2813f578b0?context=explore) | 5.0.0       | 
+| UI           | [netskopetechnicalalliances/cloudexchange:ui5-latest](https://hub.docker.com/layers/netskopetechnicalalliances/cloudexchange/ui5-latest/images/sha256-e75319d05270c7d3b8838c933ca10295b945bdce177c79ec38247e10e96056f7?context=explore) | 5.0.0        | 
+| MongoDB        | [index.docker.io/mongo:5.0.21](https://hub.docker.com/layers/library/mongo/5.0.21/images/sha256-db6fabcdc5e0f2ef20584acb238169f051158bcc35b33a4cc217441396724435?context=explore) | 5.0.21        | 
+| RabbitMQ        | [index.docker.io/rabbitmq:3.12.6-management](https://hub.docker.com/layers/library/rabbitmq/3.12.6-management/images/sha256-11bb72ba60467447335e157b1f785d67d295de5dc74590942622817fca524254?context=explore) | 3.12.6-management | 
 
 <br/>
 
-## Migrating CE v4.1.0 to CE v4.2.0 <a name="migrating-ce-v4.1.0-to-c3-v4.2.0"></a>
-
-### Prerequisite
-<div style="text-align: justify">
-
-- Prior to the migration, it is essential to stop data ingestion to maintain data integrity.
-- As a part of the migration process, it is necessary to stop the Core container to ensure a smooth transition.
-</div>
+## Migrating CE v4.2.0 to CE v5.0.0 <a name="migrating-ce-v4.2.0-to-c3-v5.0.0"></a>
 
 ### Notes
 <div style="text-align: justify">
 
-- Please be aware that during the migration process, there is a data loss for the custom plugins that were uploaded. This is due to a breaking change in the persistent volume claim. Therefore, it will be necessary to reupload those custom plugins after completing the migration to ensure their availability in the updated system. It is advisable to take appropriate measures to back up and retain any critical custom plugins prior to the migration to mitigate any potential loss of data.
-- **Plan for Downtime:** Allocate a maintenance window and inform stakeholders to minimize disruptions.
-- **Backup Configuration and Data:** Create backups of relevant configuration files and critical data to ensure a safe migration.
-- **Notify Stakeholders:** Communicate the migration schedule, expected downtime, and potential impact to stakeholders.
-- **Stop Data Ingestion:** Gracefully halt the data ingestion process to prevent data loss or inconsistencies.
-- **Stop Core and Worker Deployments:** Properly shut down the core and worker (for CE v4.1.0, the number of worker containers will already be 0) deployments to prepare for the migration due to one breaking change in Persistent Volume Claim (PVC).
-- **Modify Configuration:** Make necessary changes to configurations, addressing any breaking changes or compatibility requirements, which means get latest helm chart for CE v4.2.0.
-- **Update to CE v4.2.0:** Follow the appropriate update procedure (as mentioned below) to migrate to CE v4.2.0.
+- Please be aware that during the migration process, there will be no data loss for the custom plugins that have been uploaded. Therefore, there is no need to re-upload those custom plugins, and you do not need to back up and retain any critical custom plugins before the migration.
+
+- **Modify Configuration:** Make necessary changes to configurations, which means get latest helm chart for CE v5.0.0.
+- **Update to CE v5.0.0:** Follow the appropriate update procedure to migrate to CE v5.0.0.
 - **Verify Migration:** Conduct thorough testing to ensure the migration was successful and all functionalities are intact.
 - **Complete Post-Migration Tasks:** Inform stakeholders about the completion of the migration and perform specific post migration steps if any based on the end-users use-case 
 </div>
 <div style="text-align: justify">
-By following these steps, you can migrate to CE v4.2.0 while minimizing disruptions and ensuring a smooth transition for your system.
+By following these steps, you can migrate to CE v5.0.0 while minimizing disruptions and ensuring a smooth transition for your system.
 
-- Retrieve Core and Worker deployments names.
-  ```
-  kubectl get deployment -n <namespace> 
-  ```
->**Note:** As a prerequisite, it is essential to halt data ingestion before proceeding with the deletion of the Core and Worker deployments.
-- Using the provided deployments names from the previous step, delete the Core and Worker deployments using the following command.
-  ```
-  kubectl delete deployment <core-deployment-name> <worker-deployment-name> -n <namespapce>
-  ```
-- Retrieve Custom plugin PVC name.
-  ```
-  kubectl get pvc -n <namespcae>
-  ```
-- After confirming the successful deletion of the Core container, proceed to delete the Persistent Volume Claim (PVC) using the appropriate command or method.
-  ```
-  kubectl delete pvc <custom-plugin-pvc-name> -n <namespace>
-  ```
->**Note:** Before proceeding with the following step, ensure that you have a backup of the MongoDB data to safeguard against any potential data loss or unintended consequences.
-- Download the Helm chart for CE v4.2.0 and make any necessary modifications to the chart's values or configuration files if required. Once the changes have been done, deploy the updated Helm chart to implement the desired changes in your CE environment.
+- Download the Helm chart for CE v5.0.0 and make any necessary modifications to the chart's values or configuration files if required. Once the changes have been done, deploy the updated Helm chart to implement the desired changes in your CE environment.
   ```
   helm upgrade <release-name> . -n <namespace> -f <values-override-file>
   ```
-- After the successful migration to v4.2.0, ensure that the MongoDB and RabbitMQ StatefulSets have completed the rolling update, resulting in the creation of new containers for the Core and Worker components. Perform a series of sanity tests to verify the functionality and stability of the migrated system. Additionally, check the CE version from the CE user interface to confirm the successful migration and ensure that the updated version v4.2.0 is reflected.
+
+- Retrieve Mongodb statefulset pods name.
+  ```
+  kubectl get pods -n <namespace> 
+- Using the retrieved mongodb statefulset pods name from the previous step, delete the Mongodb Statefulset pods in reverse order (wait untill the deleted pod starts again with new image and becomes healthy before deleting the next pod.) using the following command.
+  ```
+  kubectl delete pod <mongodb-statefulset-pod-name> -n <namespapce>  
+- After the successful migration to v5.0.0, ensure that the MongoDB and RabbitMQ StatefulSets have completed the rolling update, resulting in the creation of new containers for the Core and Worker components. Perform a series of sanity tests to verify the functionality and stability of the migrated system. Additionally, check the CE version from the CE user interface to confirm the successful migration and ensure that the updated version v5.0.0 is reflected.
 </div>
 
 ## Restoring MongoDB Data <a name="restoring-mongodb-data"></a>
@@ -466,7 +444,7 @@ To restore existing MongoDB data in your newly deployed Netskope CE stack or an 
 ### Notes
 <div style="text-align: justify">
 
-- Please be aware that during the restore process, there is a data loss for the custom plugins that were uploaded. This is due to the revomal of persistent volume claim for Core and Worker containers. Therefore, it will be necessary to reupload those custom plugins after completing the restore to ensure their availability in the updated system. It is advisable to take appropriate measures to back up and retain any critical custom plugins prior to the restore process to mitigate any potential loss of data.
+- Please be aware that during the restore process, there is a data loss for the custom plugins that were uploaded. This is due to the removal of persistent volume claim for Core and Worker containers. Therefore, it will be necessary to reupload those custom plugins after completing the restore to ensure their availability in the updated system. It is advisable to take appropriate measures to back up and retain any critical custom plugins prior to the restore process to mitigate any potential loss of data.
 - **Plan for Downtime:** Allocate a maintenance window and inform stakeholders to minimize disruptions.
 - **Notify Stakeholders:** Communicate the restore process schedule, expected downtime, and potential impact to stakeholders.
 - **Stop Data Ingestion:** Gracefully halt the data ingestion process to prevent data loss or inconsistencies.
@@ -594,8 +572,3 @@ Stop all nodes in the other partitions, then start them all up again. When they 
 For more information, refer [RabbitMQ Clustering and Network Partitions](https://www.rabbitmq.com/partitions.html#detecting)
 
 </div>
-
-
-
-
-
