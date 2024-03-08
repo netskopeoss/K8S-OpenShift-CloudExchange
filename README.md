@@ -320,9 +320,9 @@ Install the helm chart by following the steps mentioned in the above section [he
 
 ## Package Sizing Matrix (Horizontally-scaled Approach) <a name="package-sizing-matrix-horizontally-scaled-approach"></a>
 
-This section depicts the required CPUs and Memory for containers based on the Netskope Cloud Exchange package types depending on the use case for a horiozontally-scaled approach.
+This section depicts the required CPUs and Memory for containers based on the Netskope Cloud Exchange package types depending on the use case for a horizontally-scaled approach.
 
-| Package Type | # of Core Contianers | Core Container Resources | # of Worker Containers | Worker Container Resources | # of UI Containers | UI Container Resources | # of MongoDB Containers | MongoDB Container Resources | # of RabbitMQ Containesr | RabbitMQ Container Resources | Worker Concurrency | RabbitMQ Available Storage |
+| Package Type | # of Core Containers | Core Container Resources | # of Worker Containers | Worker Container Resources | # of UI Containers | UI Container Resources | # of MongoDB Containers | MongoDB Container Resources | # of RabbitMQ Containers | RabbitMQ Container Resources | Worker Concurrency | RabbitMQ Available Storage |
 | ------------ | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
 | Extra Small  | 1 | <pre>limits: <br/> memory: 2Gi <br/> cpu: 1000m <br/>requests: <br> memory: 1Gi <br> cpu: 500m </pre> | 2 | <pre>limits: <br/> memory: 3500Mi <br/> cpu: 2000m <br/>requests: <br> memory: 1500Mi <br> cpu: 1000m </pre> | 2 | <pre>limits: <br/> memory: 250Mi <br/> cpu: 750m <br/>requests: <br> memory: 125Mi <br> cpu: 325m </pre> | 3 | <pre>limits: <br/> memory: 1Gi <br/> cpu: 2000m <br/>requests: <br> memory: 500Mi <br> cpu: 1000m </pre> | 3 | <pre>limits: <br/> memory: 3Gi <br/> cpu: 1000m <br/>requests: <br> memory: 1500Mi <br> cpu: 500m </pre> | 3 | 42949672960 |
 | Small  | 1 | <pre>limits: <br/> memory: 2Gi <br/> cpu: 1000m <br/>requests: <br> memory: 1Gi <br> cpu: 500m </pre> | 3 | <pre>limits: <br/> memory: 3500Mi <br/> cpu: 2000m <br/>requests: <br> memory: 1500Mi <br> cpu: 1000m </pre> | 2 | <pre>limits: <br/> memory: 250Mi <br/> cpu: 750m <br/>requests: <br> memory: 125Mi <br> cpu: 325m </pre> | 3 | <pre>limits: <br/> memory: 1Gi <br/> cpu: 2000m <br/>requests: <br> memory: 500Mi <br> cpu: 1000m </pre> | 3 | <pre>limits: <br/> memory: 3Gi <br/> cpu: 1000m <br/>requests: <br> memory: 1500Mi <br> cpu: 500m </pre> | 3 | 42949672960 |
@@ -357,7 +357,7 @@ By applying these specific configurations, you can deploy Netskope CE with a ver
 
 This section depicts the required CPUs and Memory for containers based on the Netskope Cloud Exchange package types depending on the use case for a vertically-scaled approach.
 
-| Package Type | # of Core Contianers | Core Container Resources | # of Worker Containers | # of UI Containers | UI Container Resources | # of MongoDB Containers | MongoDB Container Resources | # of RabbitMQ Containesr | RabbitMQ Container Resources | Worker Concurrency | RabbitMQ Available Storage |
+| Package Type | # of Core Containers | Core Container Resources | # of Worker Containers | # of UI Containers | UI Container Resources | # of MongoDB Containers | MongoDB Container Resources | # of RabbitMQ Containers | RabbitMQ Container Resources | Worker Concurrency | RabbitMQ Available Storage |
 | ------------ | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
 | Extra Small  | 1 | <pre>limits: <br/> memory: 4Gi <br/> cpu: 4000m <br/>requests: <br> memory: 2Gi <br> cpu: 2000m </pre> | 0 | 2 | <pre>limits: <br/> memory: 250Mi <br/> cpu: 750m <br/>requests: <br> memory: 125Mi <br> cpu: 325m </pre> | 3 | <pre>limits: <br/> memory: 1Gi <br/> cpu: 2000m <br/>requests: <br> memory: 500Mi <br> cpu: 1000m </pre> | 3 | <pre>limits: <br/> memory: 3Gi <br/> cpu: 1000m <br/>requests: <br> memory: 1500Mi <br> cpu: 500m </pre> | 6 | 42949672960 |
 | Small  | 1 | <pre>limits: <br/> memory: 8Gi <br/> cpu: 6000m <br/>requests: <br> memory: 2Gi <br> cpu: 3000m </pre> | 0 | 2 | <pre>limits: <br/> memory: 250Mi <br/> cpu: 750m <br/>requests: <br> memory: 125Mi <br> cpu: 325m </pre> | 3 | <pre>limits: <br/> memory: 1Gi <br/> cpu: 2000m <br/>requests: <br> memory: 500Mi <br> cpu: 1000m </pre> | 3 | <pre>limits: <br/> memory: 3Gi <br/> cpu: 1000m <br/>requests: <br> memory: 1500Mi <br> cpu: 500m </pre> | 9 | 42949672960 |
@@ -368,7 +368,7 @@ This section depicts the required CPUs and Memory for containers based on the Ne
 
 ## Comparison of Vertical-scaling v/s Horizontal-scaling Compute Requirements <a name="comparison-of-vs-hs"></a>
 
-This section depicts the comparison of the underlying (nodes) compute power required in both the approaches of CE deployment (Vertically-scaled v/s Horizontally-scaled). Here, we have considered the High Availability (HA) aspects while desgining the cluster and the helm configurations.
+This section depicts the comparison of the underlying (nodes) compute power required in both the approaches of CE deployment (Vertically-scaled v/s Horizontally-scaled). Here, we have considered the High Availability (HA) aspects while designing the cluster and the helm configurations.
 
 | Package Type | Vertical-scaling Benchmarking     | Horizontal-scaling Benchmarking  |
 | ------------ | --------------------------------- | -------------------------------- |
@@ -423,7 +423,7 @@ By following these steps, you can migrate to CE v5.0.0 while minimizing disrupti
 - Retrieve Mongodb statefulset pods name.
   ```
   kubectl get pods -n <namespace> 
-- Using the retrieved mongodb statefulset pods name from the previous step, delete the Mongodb Statefulset pods in reverse order (wait untill the deleted pod starts again with new image and becomes healthy before deleting the next pod.) using the following command.
+- Using the retrieved mongodb statefulset pods name from the previous step, delete the Mongodb Statefulset pods in reverse order (wait until the deleted pod starts again with new image and becomes healthy before deleting the next pod.) using the following command.
   ```
   kubectl delete pod <mongodb-statefulset-pod-name> -n <namespapce>  
 - After the successful migration to v5.0.0, ensure that the MongoDB and RabbitMQ StatefulSets have completed the rolling update, resulting in the creation of new containers for the Core and Worker components. Perform a series of sanity tests to verify the functionality and stability of the migrated system. Additionally, check the CE version from the CE user interface to confirm the successful migration and ensure that the updated version v5.0.0 is reflected.
@@ -462,11 +462,11 @@ By following these steps, one can minimize disruptions and ensure a smooth resto
 >**Note:** As a prerequisite, it is essential to halt data ingestion before proceeding with the deletion of the Core and Worker deployments.
 - Using the provided deployments names from the previous step, delete the Core and Worker deployments using the following command.
   ```
-  kubectl delete deployment <core-deployment-name> <worker-deployment-name> -n <namespapce>
+  kubectl delete deployment <core-deployment-name> <worker-deployment-name> -n <namespace>
   ```
 - Retrieve Custom plugin PVC name.
   ```
-  kubectl get pvc -n <namespcae>
+  kubectl get pvc -n <namespace>
   ```
 - After confirming the successful deletion of the Core and Worker containers, proceed to delete the Persistent Volume Claim (PVC) using the appropriate command or method.
   ```
@@ -482,7 +482,7 @@ By following these steps, one can minimize disruptions and ensure a smooth resto
       kind: Pod
       metadata:
         name: restore-mongodb
-        namespace: <namespcae-name>
+        namespace: <namespace-name>
       spec: 
         containers:
           - env:
@@ -518,7 +518,7 @@ By following these steps, one can minimize disruptions and ensure a smooth resto
     ```
     mongorestore --uri=$MONGO_CONNECTION_STRING --gzip  --archive=<dump-file> --drop;
     ```
-- Now that we have successfully restored the data, we can redeploy the actaul helm chart with the required values so that it will automatically detect change and bring the kubernetes resources in its desired state keeping the restored data persistent.
+- Now that we have successfully restored the data, we can redeploy the actual helm chart with the required values so that it will automatically detect change and bring the Kubernetes resources in its desired state keeping the restored data persistent.
   ```
   helm upgrade <release-name> . -n <namespace> -f <values-override-file>
   ```
